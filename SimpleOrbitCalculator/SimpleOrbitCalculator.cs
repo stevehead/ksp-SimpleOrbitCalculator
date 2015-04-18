@@ -6,68 +6,120 @@ using UnityEngine;
 
 namespace SimpleOrbitCalculator
 {
-    [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class OrbitCalculatorGUIController : UnityEngine.MonoBehaviour
     {
         private const string PluginName = "Simple Orbit Calculator";
         private const string PluginDirectoryName = "SimpleOrbitCalculator";
         private const string PluginIconButtonStock = "icon_button_stock";
 
-        private bool windowOpen = false;
+        private static bool windowOpen = false;
+        private bool isActivated = false;
         private Rect windowPos = new Rect(100, 100, 800, 465);
 
         private List<CelestialBody> celestialBodies;
         private string[] celestialSelectValues;
         private int selectedCelestialIndex = 0;
 
-        private ApplicationLauncherButton SOCButtonStock = null;
-
-        public void Awake()
-        {
-            LoadCelestials();
-            LoadCelestialSelectValues();
-
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-        }
-
-        void OnGUIAppLauncherReady()
-        {
-            if (ApplicationLauncher.Ready)
-            {
-                string pluginIconButtonStockPath = String.Format("{0}/Textures/{1}", PluginDirectoryName, PluginIconButtonStock);
-                SOCButtonStock = ApplicationLauncher.Instance.AddModApplication(
-                    OnAppLaunchToggleOn, OnAppLaunchToggleOff,
-                    DummyVoid, DummyVoid,
-                    DummyVoid, DummyVoid,
-                    ApplicationLauncher.AppScenes.SPACECENTER,
-                    (Texture)GameDatabase.Instance.GetTexture(pluginIconButtonStockPath, false));
-            }
-        }
+        private static ApplicationLauncherButton appLauncherButton = null;
 
         void OnAppLaunchToggleOn()
         {
+            if (appLauncherButton == null)
+            {
+                Debug.LogError(PluginName + " :: OnAppLaunchToggleOn called without a button.");
+                return;
+            }
+
             windowOpen = true;
         }
 
         void OnAppLaunchToggleOff()
         {
+            if (appLauncherButton == null)
+            {
+                Debug.LogError(PluginName + " :: OnAppLaunchToggleOff called without a button.");
+                return;
+            }
             windowOpen = false;
         }
 
-        void DummyVoid() { }
-
-        public void Start()
+        void RemoveFromAppLauncher()
         {
-            RenderingManager.AddToPostDrawQueue(0, new Callback(DrawGUI));
-            print(PluginName + "GUI Loaded");
+            if (appLauncherButton != null)
+            {
+                ApplicationLauncher.Instance.RemoveApplication(appLauncherButton);
+                appLauncherButton = null;
+                GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
+                GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherDestroyed);
+                GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
+            }
+        }
+
+        void OnGUIAppLauncherReady()
+        {
+            if (ApplicationLauncher.Ready && appLauncherButton == null)
+            {
+                string pluginIconButtonStockPath = String.Format("{0}/Textures/{1}", PluginDirectoryName, PluginIconButtonStock);
+                appLauncherButton = ApplicationLauncher.Instance.AddModApplication(
+                    OnAppLaunchToggleOn, OnAppLaunchToggleOff,
+                    null, null,
+                    null, null,
+                    ApplicationLauncher.AppScenes.ALWAYS,
+                    (Texture)GameDatabase.Instance.GetTexture(pluginIconButtonStockPath, false));
+            }
+        }
+
+        void OnGuiAppLauncherDestroyed()
+        {
+            if (appLauncherButton != null)
+            {
+                RemoveFromAppLauncher();
+            }
+        }
+
+        void OnGameSceneLoadRequestedForAppLauncher(GameScenes sceneToLoad)
+        {
+            if (appLauncherButton != null)
+            {
+                RemoveFromAppLauncher();
+            }
+        }
+
+        Boolean IsValidScene()
+        {
+            return HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.TRACKSTATION;
+        }
+
+        public void Awake()
+        {
+            if (appLauncherButton == null)
+            {
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
+                GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
+            }
+
+            if (IsValidScene())
+            {
+                RenderingManager.AddToPostDrawQueue(3, new Callback(DrawGUI));
+            }
         }
 
         public void DrawGUI()
         {
-            if (windowOpen)
+            if (IsValidScene())
             {
-                windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName,
-                    GUILayout.Width(800), GUILayout.Height(465), GUILayout.ExpandWidth(false));
+                if (windowOpen)
+                {
+                    if (!isActivated)
+                    {
+                        LoadAllCelestialInformation();
+                    }
+                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName,
+                        GUILayout.Width(800), GUILayout.Height(465), GUILayout.ExpandWidth(false));
+                }
+                isActivated = windowOpen;
             }
         }
 
@@ -85,19 +137,19 @@ namespace SimpleOrbitCalculator
             GUI.DragWindow();
         }
 
-        private void OnDestroy()
+        /// <summary>
+        /// Loads all the information for the celestial bodies.
+        /// </summary>
+        private void LoadAllCelestialInformation()
         {
-            GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
-            if (SOCButtonStock != null)
-            {
-                ApplicationLauncher.Instance.RemoveModApplication(SOCButtonStock);
-            }
+            LoadKnownCelestials();
+            LoadCelestialSelectValues();
         }
 
         /// <summary>
         /// Grabs all the celestials known to KSP and orders them based on reference body and SMA.
         /// </summary>
-        private void LoadCelestials()
+        private void LoadKnownCelestials()
         {
             celestialBodies = new List<CelestialBody>();
 
@@ -137,7 +189,7 @@ namespace SimpleOrbitCalculator
                 celestialSelectValues[i] = celestialBodies[i].name;
 
                 // If the body is the same as the current vessel's main body, set this as the initial selected index.
-                if (HighLogic.LoadedSceneIsFlight && celestialBodies[i] == FlightGlobals.ActiveVessel.mainBody)
+                /*if (HighLogic.LoadedSceneIsFlight && celestialBodies[i] == FlightGlobals.ActiveVessel.mainBody)
                 {
                     initialSelectedIndex = i;
                 }
@@ -145,7 +197,7 @@ namespace SimpleOrbitCalculator
                 else if (initialSelectedIndex < 0 && celestialBodies[i].name.Equals("Kerbin"))
                 {
                     initialSelectedIndex = i;
-                }
+                }*/
             }
 
             // If an initial selected index was found, set the selected index to it.
