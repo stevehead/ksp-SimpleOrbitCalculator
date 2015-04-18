@@ -21,6 +21,20 @@ namespace SimpleOrbitCalculator
         private string[] celestialSelectValues;
         private int selectedCelestialIndex = 0;
 
+        private bool lockPeriapsis = false;
+        private bool lockApoapsis = false;
+        private bool lockEccentricity = false;
+        private bool lockSMA = false;
+        private bool lockPeriod = false;
+        private bool useAltitideAspides = true;
+
+        private string periapsisText = "";
+        private string apoapsisText = "";
+        private string eccentricityText = "";
+        private string smaText = "";
+        private string periodText = "";
+        private string errorText = "";
+
         private static ApplicationLauncherButton appLauncherButton = null;
 
         void OnAppLaunchToggleOn()
@@ -125,16 +139,200 @@ namespace SimpleOrbitCalculator
 
         private void MainWindow(int windowID)
         {
+            int countLocks = 0;
+            bool lockLimitReached = false;
+            if (lockPeriapsis) countLocks++;
+            if (lockApoapsis) countLocks++;
+            if (lockEccentricity) countLocks++;
+            if (lockSMA) countLocks++;
+            if (lockPeriod) countLocks++;
+
+            if (countLocks >= 2) lockLimitReached = true;
+
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical();
             GUILayout.Label("Select a Body:");
             selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, 1);
+            GUILayout.EndVertical();
+
             GUILayout.BeginVertical();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Current Body: " + celestialSelectValues[selectedCelestialIndex]);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (!lockPeriapsis && lockLimitReached) GUI.enabled = false;
+            lockPeriapsis = GUILayout.Toggle(lockPeriapsis, "Periapsis (m)");
+            if (!lockPeriapsis) GUI.enabled = false;
+            periapsisText = GUILayout.TextField(periapsisText);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (!lockApoapsis && lockLimitReached) GUI.enabled = false;
+            lockApoapsis = GUILayout.Toggle(lockApoapsis, "Apoapsis (m)");
+            if (!lockApoapsis) GUI.enabled = false;
+            apoapsisText = GUILayout.TextField(apoapsisText);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (!lockEccentricity && lockLimitReached) GUI.enabled = false;
+            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity");
+            if (!lockEccentricity) GUI.enabled = false;
+            eccentricityText = GUILayout.TextField(eccentricityText);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
+            lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)");
+            if (!lockSMA) GUI.enabled = false;
+            smaText = GUILayout.TextField(smaText);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
+            lockPeriod = GUILayout.Toggle(lockSMA ? false : lockPeriod, "Orbital Period (s)");
+            if (!lockPeriod) GUI.enabled = false;
+            periodText = GUILayout.TextField(periodText);
+            if(GUILayout.Button("Set to Synchronous"))
+            {
+                periodText = celestialBodies[selectedCelestialIndex].rotationPeriod.ToString();
+            }
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(50);
+            GUILayout.Label("Options");
+
+            GUILayout.BeginHorizontal();
+            useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Calculate"))
+            {
+                CalculateAndParseOrbit();
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(errorText);
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
             GUILayout.EndHorizontal();
 
             GUI.DragWindow();
+        }
+
+        private void CalculateAndParseOrbit()
+        {
+            try
+            {
+                errorText = "";
+                ParseOrbit(CalculateOrbit());
+            }
+            catch (OrbitalElementExecption e)
+            {
+                errorText = e.Message;
+            }
+            catch (Exception e)
+            {
+                errorText = "Something unusual happened";
+                Debug.LogError(e.Message);
+            }
+        }
+
+        private void ParseOrbit(SimpleOrbit orbit)
+        {
+            if (!lockApoapsis)
+            {
+                if (useAltitideAspides)
+                {
+                    apoapsisText = orbit.ApoapsisAltitude.ToString();
+                }
+                else
+                {
+                    apoapsisText = orbit.Apoapsis.ToString();
+                }
+            }
+
+            if (!lockPeriapsis)
+            {
+                if (useAltitideAspides)
+                {
+                    periapsisText = orbit.PeriapsisAltitude.ToString();
+                }
+                else
+                {
+                    periapsisText = orbit.Periapsis.ToString();
+                }
+            }
+
+            if (!lockEccentricity)
+            {
+                eccentricityText = orbit.Eccentricity.ToString();
+            }
+
+            if (!lockSMA)
+            {
+                smaText = orbit.SemiMajorAxis.ToString();
+            }
+
+            if (!lockPeriod)
+            {
+                periodText = orbit.OrbitalPeriod.ToString();
+            }
+        }
+
+        private SimpleOrbit CalculateOrbit()
+        {
+            SimpleOrbitBuilder orbitBuilder = new SimpleOrbitBuilder(celestialBodies[selectedCelestialIndex]);
+            if (lockApoapsis)
+            {
+                if (useAltitideAspides)
+                {
+                    orbitBuilder.SetApoapsisAltitude(apoapsisText);
+                }
+                else
+                {
+                    orbitBuilder.SetApoapsis(apoapsisText);
+                }
+            }
+
+            if (lockPeriapsis)
+            {
+                if (useAltitideAspides)
+                {
+                    orbitBuilder.SetPeriapsisAltitude(periapsisText);
+                }
+                else
+                {
+                    orbitBuilder.SetPeriapsis(periapsisText);
+                }
+            }
+
+            if (lockEccentricity)
+            {
+                orbitBuilder.SetEccentricity(eccentricityText);
+            }
+
+            if (lockSMA)
+            {
+                orbitBuilder.SetSemiMajorAxis(smaText);
+            }
+
+            if (lockPeriod)
+            {
+                orbitBuilder.SetOrbitalPeriod(periodText);
+            }
+
+            return orbitBuilder.Build();
         }
 
         /// <summary>
