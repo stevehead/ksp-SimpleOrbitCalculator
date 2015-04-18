@@ -179,18 +179,18 @@ namespace SimpleOrbitCalculator
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            if (!lockEccentricity && lockLimitReached) GUI.enabled = false;
-            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity");
-            if (!lockEccentricity) GUI.enabled = false;
-            eccentricityText = GUILayout.TextField(eccentricityText);
-            GUI.enabled = true;
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
             if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
             lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)");
             if (!lockSMA) GUI.enabled = false;
             smaText = GUILayout.TextField(smaText);
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (!lockEccentricity && lockLimitReached) GUI.enabled = false;
+            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity");
+            if (!lockEccentricity) GUI.enabled = false;
+            eccentricityText = GUILayout.TextField(eccentricityText);
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
