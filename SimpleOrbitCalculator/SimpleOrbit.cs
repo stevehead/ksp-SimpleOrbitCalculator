@@ -202,6 +202,11 @@ namespace SimpleOrbitCalculator
             {
                 throw new OrbitalElementExecption("Orbital period must be greater than 0.");
             }
+
+            if (apoapsis > parentBody.sphereOfInfluence)
+            {
+                throw new OrbitalElementExecption("Apoapsis located outside of SOI.");
+            }
         }
 
         private void CleanPrecisions()
