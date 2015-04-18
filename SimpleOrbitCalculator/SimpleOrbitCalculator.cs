@@ -39,12 +39,12 @@ namespace SimpleOrbitCalculator
 
         void OnAppLaunchToggleOn()
         {
-
+            windowOpen = true;
         }
 
         void OnAppLaunchToggleOff()
         {
-
+            windowOpen = false;
         }
 
         void DummyVoid() { }
