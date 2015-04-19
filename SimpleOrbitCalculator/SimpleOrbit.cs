@@ -16,10 +16,12 @@ namespace SimpleOrbitCalculator
         private readonly double orbitalPeriod;
         private readonly double apoapsisAltitude;
         private readonly double periapsisAltitude;
+        private readonly double apoapsisSpeed;
+        private readonly double periapsisSpeed;
         private readonly double meanOrbitalSpeed;
         private readonly double meanDarknessTime;
         private readonly double specificOrbitalEnergy;
-
+        
         public CelestialBody ParentBody { get { return parentBody; }}
         public double SemiMajorAxis { get { return semiMajorAxis; }}
         public double Eccentricity { get { return eccentricity; } }
@@ -28,9 +30,17 @@ namespace SimpleOrbitCalculator
         public double OrbitalPeriod { get { return orbitalPeriod; } }
         public double ApoapsisAltitude { get { return apoapsisAltitude; } }
         public double PeriapsisAltitude { get { return periapsisAltitude; } }
+        public double ApoapsisSpeed { get { return apoapsisSpeed; } }
+        public double PeriapsisSpeed { get { return periapsisSpeed; } }
         public double MeanOrbitalSpeed { get { return meanOrbitalSpeed; } }
         public double MeanDarknessTime { get { return meanDarknessTime; } }
         public double SpecificOrbitalEnergy { get { return specificOrbitalEnergy; } }
+
+        /// <summary>
+        /// ScalerType are the various scalers used by the orbit elements.
+        /// This is mostly used for string formatting purposes.
+        /// </summary>
+        public enum ScalerType { Distance, Speed, Time, SpecificEnergy };
 
         internal SimpleOrbit(CelestialBody parentBody, double semiMajorAxis, double eccentricity, double apoapsis, double periapsis, double orbitalPeriod)
         {
@@ -42,6 +52,8 @@ namespace SimpleOrbitCalculator
             this.orbitalPeriod = orbitalPeriod;
             this.apoapsisAltitude = apoapsis - parentBody.Radius;
             this.periapsisAltitude = periapsis - parentBody.Radius;
+            this.apoapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / apoapsis - 1.0 / semiMajorAxis));
+            this.periapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / periapsis - 1.0 / semiMajorAxis));
             this.meanOrbitalSpeed = Math.Sqrt(parentBody.gravParameter / semiMajorAxis) * (
                 1.0 - 1.0 / 4.0 * Math.Pow(eccentricity, 2.0)
                 - 3.0 / 64.0 * Math.Pow(eccentricity, 4.0)

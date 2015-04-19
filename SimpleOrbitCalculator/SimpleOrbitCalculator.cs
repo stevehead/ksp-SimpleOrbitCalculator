@@ -102,6 +102,11 @@ namespace SimpleOrbitCalculator
             }
         }
 
+        /// <summary>
+        /// Determines if the current game scane is valid for the plugin.
+        /// This plugin should be able to run in VAB/SPH, Flight, Space Center, and Tracking Station scenes.
+        /// </summary>
+        /// <returns>True if valid; false if not valid.</returns>
         Boolean IsValidScene()
         {
             return HighLogic.LoadedSceneIsEditor || HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.TRACKSTATION;
@@ -132,7 +137,7 @@ namespace SimpleOrbitCalculator
                     {
                         LoadAllCelestialInformation();
                     }
-                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName, GUILayout.Width(600));
+                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName, GUILayout.Width(800));
                 }
                 isActivated = windowOpen;
             }
@@ -140,6 +145,7 @@ namespace SimpleOrbitCalculator
 
         private void MainWindow(int windowID)
         {
+            // Need to deterime how many "locks" were used on the GUI inputs. We should not have more than 2.
             int countLocks = 0;
             bool lockLimitReached = false;
             if (lockPeriapsis) countLocks++;
@@ -147,10 +153,9 @@ namespace SimpleOrbitCalculator
             if (lockEccentricity) countLocks++;
             if (lockSMA) countLocks++;
             if (lockPeriod) countLocks++;
-
             if (countLocks >= 2) lockLimitReached = true;
 
-            // Window Settings
+            // Window Settings - TODO: make as class constants?
             int celestialSelectColumns = (int)Math.Ceiling(celestialBodies.Count / 20.0);
             float minCelestialSelectWidth = 100f * celestialSelectColumns;
             float lockWidth = 150f;
@@ -232,19 +237,21 @@ namespace SimpleOrbitCalculator
             if (currentOrbit != null)
             {
                 GUILayout.BeginVertical();
-                GUILayout.Label("Periapsis Alt.: " + ParseElement(currentOrbit.PeriapsisAltitude, StringParseElementTypes.Distance));
-                GUILayout.Label("Apoapsis Alt.: " + ParseElement(currentOrbit.ApoapsisAltitude, StringParseElementTypes.Distance));
-                GUILayout.Label("S.Major Axis: " + ParseElement(currentOrbit.SemiMajorAxis, StringParseElementTypes.Distance));
-                GUILayout.Label("Period: " + ParseElement(currentOrbit.OrbitalPeriod, StringParseElementTypes.Time));
-                GUILayout.Label("Mean Orbit Speed: " + ParseElement(currentOrbit.MeanOrbitalSpeed, StringParseElementTypes.Velocity));
+                GUILayout.Label("Periapsis Alt.: " + GUIUtilities.ParseOrbitElement(currentOrbit.PeriapsisAltitude, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Periapsis: " + GUIUtilities.ParseOrbitElement(currentOrbit.Periapsis, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Periapsis Speed: " + GUIUtilities.ParseOrbitElement(currentOrbit.PeriapsisSpeed, SimpleOrbit.ScalerType.Speed));
+                GUILayout.Label("S.Major Axis: " + GUIUtilities.ParseOrbitElement(currentOrbit.SemiMajorAxis, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Period: " + GUIUtilities.ParseOrbitElement(currentOrbit.OrbitalPeriod, SimpleOrbit.ScalerType.Time));
+                GUILayout.Label("SOI Limit: " + GUIUtilities.ParseOrbitElement(currentOrbit.ParentBody.sphereOfInfluence, SimpleOrbit.ScalerType.Distance));
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical();
-                GUILayout.Label("Periapsis: " + ParseElement(currentOrbit.Periapsis, StringParseElementTypes.Distance));
-                GUILayout.Label("Apoapsis: " + ParseElement(currentOrbit.Apoapsis, StringParseElementTypes.Distance));
-                GUILayout.Label("Eccentricity: " + ParseElement(currentOrbit.Eccentricity, StringParseElementTypes.Default));
-                GUILayout.Label("SOI Limit: " + ParseElement(currentOrbit.ParentBody.sphereOfInfluence, StringParseElementTypes.Distance));
-                GUILayout.Label("Darkness Length: " + ParseElement(currentOrbit.MeanDarknessTime, StringParseElementTypes.Time));
+                GUILayout.Label("Apoapsis Alt.: " + GUIUtilities.ParseOrbitElement(currentOrbit.ApoapsisAltitude, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Apoapsis: " + GUIUtilities.ParseOrbitElement(currentOrbit.Apoapsis, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Apoapsis Speed: " + GUIUtilities.ParseOrbitElement(currentOrbit.ApoapsisSpeed, SimpleOrbit.ScalerType.Speed));
+                GUILayout.Label("Eccentricity: " + GUIUtilities.ParseOrbitElement(currentOrbit.Eccentricity));
+                GUILayout.Label("Mean Orbit Speed: " + GUIUtilities.ParseOrbitElement(currentOrbit.MeanOrbitalSpeed, SimpleOrbit.ScalerType.Speed));
+                GUILayout.Label("Darkness Length: " + GUIUtilities.ParseOrbitElement(currentOrbit.MeanDarknessTime, SimpleOrbit.ScalerType.Time));
                 GUILayout.EndVertical();
             }
             GUILayout.EndHorizontal();
@@ -262,6 +269,9 @@ namespace SimpleOrbitCalculator
             GUI.DragWindow();
         }
 
+        /// <summary>
+        /// Will attempt to create the orbit from the user's inputs, and then parse the output orbit or error.
+        /// </summary>
         private void CalculateAndParseOrbit()
         {
             errorText = "";
@@ -282,30 +292,20 @@ namespace SimpleOrbitCalculator
             }
         }
 
+        /// <summary>
+        /// Will set the GUI text fields based on the input orbit.
+        /// </summary>
+        /// <param name="orbit">An orbit that was calculated.</param>
         private void ParseOrbit(SimpleOrbit orbit)
         {
             if (!lockApoapsis)
             {
-                if (useAltitideAspides)
-                {
-                    apoapsisText = orbit.ApoapsisAltitude.ToString();
-                }
-                else
-                {
-                    apoapsisText = orbit.Apoapsis.ToString();
-                }
+                apoapsisText = useAltitideAspides ? orbit.ApoapsisAltitude.ToString() : orbit.Apoapsis.ToString();
             }
 
             if (!lockPeriapsis)
             {
-                if (useAltitideAspides)
-                {
-                    periapsisText = orbit.PeriapsisAltitude.ToString();
-                }
-                else
-                {
-                    periapsisText = orbit.Periapsis.ToString();
-                }
+                periapsisText = useAltitideAspides ? orbit.PeriapsisAltitude.ToString() : orbit.Periapsis.ToString();
             }
 
             if (!lockEccentricity)
@@ -324,9 +324,14 @@ namespace SimpleOrbitCalculator
             }
         }
 
+        /// <summary>
+        /// Will create the orbit object from the user's input.
+        /// </summary>
+        /// <returns>The calculated orbit.</returns>
         private SimpleOrbit CalculateOrbit()
         {
             SimpleOrbitBuilder orbitBuilder = new SimpleOrbitBuilder(celestialBodies[selectedCelestialIndex]);
+
             if (lockApoapsis)
             {
                 if (useAltitideAspides)
@@ -380,6 +385,7 @@ namespace SimpleOrbitCalculator
 
         /// <summary>
         /// Grabs all the celestials known to KSP and orders them based on reference body and SMA.
+        /// This should be compatible with RSS scales and Planet Factory like mods.
         /// </summary>
         private void LoadKnownCelestials()
         {
@@ -438,18 +444,44 @@ namespace SimpleOrbitCalculator
                 selectedCelestialIndex = initialSelectedIndex;
             }
         }
+    }
 
-        enum StringParseElementTypes { Distance, Velocity, Time, Default };
-
-        private static string ParseElement(double input, StringParseElementTypes parseType)
+    /// <summary>
+    /// GUIUtilities is a static class of helper methods for various GUI based functions.
+    /// </summary>
+    internal static class GUIUtilities
+    {
+        /// <summary>
+        /// Converts an unitless orbit element into an easy to read string.
+        /// </summary>
+        /// <param name="input">The orbit element value.</param>
+        /// <returns>The string representation.</returns>
+        public static string ParseOrbitElement(double input)
         {
-            switch (parseType)
+            // Default to 3 decimals.
+            return string.Format("{0:0.###}", input);
+        }
+
+        /// <summary>
+        /// Converts orbit element scalers into an easy to read string.
+        /// </summary>
+        /// <param name="input">The orbit element value.</param>
+        /// <param name="elementType">The scaler type.</param>
+        /// <returns>The string representation.</returns>
+        public static string ParseOrbitElement(double input, SimpleOrbit.ScalerType elementType)
+        {
+            switch (elementType)
             {
-                case StringParseElementTypes.Distance:
+                // Distance will be 3 decimals and in kilometers.
+                case SimpleOrbit.ScalerType.Distance:
                     return string.Format("{0:0.###} km", input / 1000.0);
-                case StringParseElementTypes.Velocity:
-                    return string.Format("{0:0.###} m/s", input);
-                case StringParseElementTypes.Time:
+
+                // Speed will be 1 decimal and in meters per seconds.
+                case SimpleOrbit.ScalerType.Speed:
+                    return string.Format("{0:0.#} m/s", input);
+
+                // Time will be displayed as hours, minutes and seconds.
+                case SimpleOrbit.ScalerType.Time:
                     int seconds = (int)Math.Round(input);
                     TimeSpan span = new TimeSpan(0, 0, seconds);
 
@@ -459,8 +491,14 @@ namespace SimpleOrbitCalculator
                     if (span.Minutes > 0) output += span.Minutes + "m ";
                     if (span.Seconds > 0) output += span.Seconds + "s ";
                     return output.Trim();
+
+                // Specific Energy will be 3 decimal and in joules per kilograms.
+                case SimpleOrbit.ScalerType.SpecificEnergy:
+                    return string.Format("{0:0.###} J/kg", input);
+
+                // Will default to 3 decimals for unknown types.
                 default:
-                    return string.Format("{0:0.###}", input);
+                    return ParseOrbitElement(input);
             }
         }
     }
