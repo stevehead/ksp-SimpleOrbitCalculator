@@ -132,7 +132,7 @@ namespace SimpleOrbitCalculator
                     {
                         LoadAllCelestialInformation();
                     }
-                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName, GUILayout.Width(500));
+                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName, GUILayout.Width(600));
                 }
                 isActivated = windowOpen;
             }
@@ -232,7 +232,7 @@ namespace SimpleOrbitCalculator
             if (currentOrbit != null)
             {
                 GUILayout.BeginVertical();
-                GUILayout.Label("Periapsis Alt.: " + ParseElement(currentOrbit.Periapsis, StringParseElementTypes.Distance));
+                GUILayout.Label("Periapsis Alt.: " + ParseElement(currentOrbit.PeriapsisAltitude, StringParseElementTypes.Distance));
                 GUILayout.Label("Apoapsis Alt.: " + ParseElement(currentOrbit.ApoapsisAltitude, StringParseElementTypes.Distance));
                 GUILayout.Label("S.Major Axis: " + ParseElement(currentOrbit.SemiMajorAxis, StringParseElementTypes.Distance));
                 GUILayout.Label("Period: " + ParseElement(currentOrbit.OrbitalPeriod, StringParseElementTypes.Time));
@@ -453,8 +453,9 @@ namespace SimpleOrbitCalculator
                     int seconds = (int)Math.Round(input);
                     TimeSpan span = new TimeSpan(0, 0, seconds);
 
+                    int hours = span.Days * 24 + span.Hours;
                     string output = "";
-                    if (span.Hours > 0) output += span.Hours + "h ";
+                    if (hours > 0) output += hours + "h ";
                     if (span.Minutes > 0) output += span.Minutes + "m ";
                     if (span.Seconds > 0) output += span.Seconds + "s ";
                     return output.Trim();
