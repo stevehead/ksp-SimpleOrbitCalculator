@@ -32,3 +32,6 @@ Note: Because the calculation will fill in other elements that you did not choos
 
 ### License
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
+
+### Changelog
+4/19/2105 - **v1.0.0** *Allergic Applesauce* - Initial release for KSP 0.90
