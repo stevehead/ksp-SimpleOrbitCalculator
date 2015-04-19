@@ -22,6 +22,7 @@ Note: Because the calculation will fill in other elements that you did not choos
 * Other information displayed after calculation: Orbital Speeds at Apoapsis and Periapsis, Mean Orbital Speed, Sphere of Influence of Parent Body, Mean Darkness Length (useful for Remote Tech satellite electric charge calculations).
 
 ### Upcoming features
+* A better UI!
 * Possibly more input values.
 * Ability to save two orbits around the same parent body, and calculate the delta-V required for the Hohmann transfer.
 
