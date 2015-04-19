@@ -35,6 +35,8 @@ namespace SimpleOrbitCalculator
         private string periodText = "";
         private string errorText = "";
 
+        private SimpleOrbit currentOrbit = null;
+
         private static ApplicationLauncherButton appLauncherButton = null;
 
         void OnAppLaunchToggleOn()
@@ -130,8 +132,7 @@ namespace SimpleOrbitCalculator
                     {
                         LoadAllCelestialInformation();
                     }
-                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName,
-                        GUILayout.Width(800), GUILayout.Height(465), GUILayout.ExpandWidth(false));
+                    windowPos = GUILayout.Window(PluginName.GetHashCode(), windowPos, MainWindow, PluginName, GUILayout.Width(500));
                 }
                 isActivated = windowOpen;
             }
@@ -149,14 +150,22 @@ namespace SimpleOrbitCalculator
 
             if (countLocks >= 2) lockLimitReached = true;
 
+            // Window Settings
+            int celestialSelectColumns = (int)Math.Ceiling(celestialBodies.Count / 20.0);
+            float minCelestialSelectWidth = 100f * celestialSelectColumns;
+            float lockWidth = 150f;
+            float inputWidth = 150f;
+            float synchPeriodButtonWidth = 25f;
+            float calculateButtonWidth = 100f;
+
             GUILayout.BeginHorizontal();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.MinWidth(minCelestialSelectWidth), GUILayout.ExpandWidth(true));
             GUILayout.Label("Select a Body:");
-            selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, 1);
+            selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, celestialSelectColumns);
             GUILayout.EndVertical();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Current Body: " + celestialSelectValues[selectedCelestialIndex]);
@@ -164,46 +173,80 @@ namespace SimpleOrbitCalculator
 
             GUILayout.BeginHorizontal();
             if (!lockPeriapsis && lockLimitReached) GUI.enabled = false;
-            lockPeriapsis = GUILayout.Toggle(lockPeriapsis, "Periapsis (m)");
+            lockPeriapsis = GUILayout.Toggle(lockPeriapsis, "Periapsis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
             if (!lockPeriapsis) GUI.enabled = false;
-            periapsisText = GUILayout.TextField(periapsisText);
+            periapsisText = GUILayout.TextField(periapsisText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             if (!lockApoapsis && lockLimitReached) GUI.enabled = false;
-            lockApoapsis = GUILayout.Toggle(lockApoapsis, "Apoapsis (m)");
+            lockApoapsis = GUILayout.Toggle(lockApoapsis, "Apoapsis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
             if (!lockApoapsis) GUI.enabled = false;
-            apoapsisText = GUILayout.TextField(apoapsisText);
+            apoapsisText = GUILayout.TextField(apoapsisText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
-            lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)");
+            lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
             if (!lockSMA) GUI.enabled = false;
-            smaText = GUILayout.TextField(smaText);
+            smaText = GUILayout.TextField(smaText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             if (!lockEccentricity && lockLimitReached) GUI.enabled = false;
-            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity");
+            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
             if (!lockEccentricity) GUI.enabled = false;
-            eccentricityText = GUILayout.TextField(eccentricityText);
+            eccentricityText = GUILayout.TextField(eccentricityText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
-            lockPeriod = GUILayout.Toggle(lockSMA ? false : lockPeriod, "Orbital Period (s)");
+            lockPeriod = GUILayout.Toggle(lockSMA ? false : lockPeriod, "Orbital Period (s)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
             if (!lockPeriod) GUI.enabled = false;
-            periodText = GUILayout.TextField(periodText);
-            if(GUILayout.Button("Set to Synchronous"))
+            periodText = GUILayout.TextField(periodText, GUILayout.Width(inputWidth - synchPeriodButtonWidth - 4), GUILayout.ExpandWidth(false));
+            if (GUILayout.Button("S", GUILayout.Width(synchPeriodButtonWidth), GUILayout.ExpandWidth(false)))
             {
                 periodText = celestialBodies[selectedCelestialIndex].rotationPeriod.ToString();
             }
             GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Calculate", GUILayout.Width(calculateButtonWidth)))
+            {
+                CalculateAndParseOrbit();
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(50);
+
+            GUILayout.BeginHorizontal();
+            if (errorText != "")
+            {
+                GUILayout.Label(errorText);
+            }
+            if (currentOrbit != null)
+            {
+                GUILayout.BeginVertical();
+                GUILayout.Label("Periapsis Alt.: " + ParseElement(currentOrbit.Periapsis, StringParseElementTypes.Distance));
+                GUILayout.Label("Apoapsis Alt.: " + ParseElement(currentOrbit.ApoapsisAltitude, StringParseElementTypes.Distance));
+                GUILayout.Label("S.Major Axis: " + ParseElement(currentOrbit.SemiMajorAxis, StringParseElementTypes.Distance));
+                GUILayout.Label("Period: " + ParseElement(currentOrbit.OrbitalPeriod, StringParseElementTypes.Time));
+                GUILayout.Label("Mean Orbit Speed: " + ParseElement(currentOrbit.MeanOrbitalSpeed, StringParseElementTypes.Velocity));
+                GUILayout.EndVertical();
+
+                GUILayout.BeginVertical();
+                GUILayout.Label("Periapsis: " + ParseElement(currentOrbit.Periapsis, StringParseElementTypes.Distance));
+                GUILayout.Label("Apoapsis: " + ParseElement(currentOrbit.Apoapsis, StringParseElementTypes.Distance));
+                GUILayout.Label("Eccentricity: " + ParseElement(currentOrbit.Eccentricity, StringParseElementTypes.Default));
+                GUILayout.Label("SOI Limit: " + ParseElement(currentOrbit.ParentBody.sphereOfInfluence, StringParseElementTypes.Distance));
+                GUILayout.Label("Darkness Length: " + ParseElement(currentOrbit.MeanDarknessTime, StringParseElementTypes.Time));
+                GUILayout.EndVertical();
+            }
             GUILayout.EndHorizontal();
 
             GUILayout.Space(50);
@@ -211,17 +254,6 @@ namespace SimpleOrbitCalculator
 
             GUILayout.BeginHorizontal();
             useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Calculate"))
-            {
-                CalculateAndParseOrbit();
-            }
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(errorText);
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -232,10 +264,12 @@ namespace SimpleOrbitCalculator
 
         private void CalculateAndParseOrbit()
         {
+            errorText = "";
+            currentOrbit = null;
             try
             {
-                errorText = "";
-                ParseOrbit(CalculateOrbit());
+                currentOrbit = CalculateOrbit();
+                ParseOrbit(currentOrbit);
             }
             catch (OrbitalElementExecption e)
             {
@@ -402,6 +436,30 @@ namespace SimpleOrbitCalculator
             if (initialSelectedIndex >= 0)
             {
                 selectedCelestialIndex = initialSelectedIndex;
+            }
+        }
+
+        enum StringParseElementTypes { Distance, Velocity, Time, Default };
+
+        private static string ParseElement(double input, StringParseElementTypes parseType)
+        {
+            switch (parseType)
+            {
+                case StringParseElementTypes.Distance:
+                    return string.Format("{0:0.###} km", input / 1000.0);
+                case StringParseElementTypes.Velocity:
+                    return string.Format("{0:0.###} m/s", input);
+                case StringParseElementTypes.Time:
+                    int seconds = (int)Math.Round(input);
+                    TimeSpan span = new TimeSpan(0, 0, seconds);
+
+                    string output = "";
+                    if (span.Hours > 0) output += span.Hours + "h ";
+                    if (span.Minutes > 0) output += span.Minutes + "m ";
+                    if (span.Seconds > 0) output += span.Seconds + "s ";
+                    return output.Trim();
+                default:
+                    return string.Format("{0:0.###}", input);
             }
         }
     }
