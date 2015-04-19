@@ -11,7 +11,7 @@ This plugin could possibly give false results when using a mod that can alter th
 1. Select the celestial body on the left.
 2. To the right of the celestial bodies, select two orbital elements (you cannot select both semi-major axis and orbital period; it would create an ambiguous case). The other elements will be disabled from input at this point.
 3. As an option, you can use either apoapsis/periapsis as altitudes above sea level of parent body or as distances from the center of the parent body. Just toggle the *Use Altitudes for Apsides* option near the bottom under Options.
-4. Enter your target values.
+4. Enter your target values. The "S" button on the same row of the orbital period will set the orbital period to the parent body's rotation period (useful for synchronous orbits).
 5. Click the *Calculate* button, which will fill in the other elements and display below more in-depth information of the calculated orbit. Any errors will be reported.
 
 Note: Because the calculation will fill in other elements that you did not choose, you will be free to use those easily in other calculations. Just de-select the elements you do not need, and select the new ones. This is very useful for calculating Hohmann transfers.
