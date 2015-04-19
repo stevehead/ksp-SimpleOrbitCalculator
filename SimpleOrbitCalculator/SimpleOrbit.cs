@@ -251,12 +251,12 @@ namespace SimpleOrbitCalculator
                     {
                         semiMajorAxis = (apoapsis + periapsis) / 2.0;
                     }
-                    // Apoapsis and Semi-Major-Axis
+                    // Apoapsis and Semi-Major Axis
                     else if (inputElements.Contains("apoapsis") && inputElements.Contains("semiMajorAxis"))
                     {
                         periapsis = 2.0 * semiMajorAxis - apoapsis;
                     }
-                    // Periapsis and Semi-Major-Axis
+                    // Periapsis and Semi-Major Axis
                     else if (inputElements.Contains("periapsis") && inputElements.Contains("semiMajorAxis"))
                     {
                         apoapsis = 2.0 * semiMajorAxis - periapsis;
@@ -266,18 +266,27 @@ namespace SimpleOrbitCalculator
                 }
                 else
                 {
-                    // Eccentricity and Apoapsis
-                    if (inputElements.Contains("apoapsis"))
+                    if (!inputElements.Contains("semiMajorAxis"))
                     {
-                        periapsis = apoapsis * (1.0 - eccentricity) / (1.0 + eccentricity);
-                    }
-                    // Eccentricity and Periapsis
-                    else if (inputElements.Contains("periapsis"))
-                    {
-                        apoapsis = periapsis * (1.0 + eccentricity) / (1.0 - eccentricity);
-                    }
+                        // Eccentricity and Apoapsis
+                        if (inputElements.Contains("apoapsis"))
+                        {
+                            periapsis = apoapsis * (1.0 - eccentricity) / (1.0 + eccentricity);
+                        }
+                        // Eccentricity and Periapsis
+                        else if (inputElements.Contains("periapsis"))
+                        {
+                            apoapsis = periapsis * (1.0 + eccentricity) / (1.0 - eccentricity);
+                        }
 
-                    semiMajorAxis = (apoapsis + periapsis) / 2.0;
+                        semiMajorAxis = (apoapsis + periapsis) / 2.0;
+                    }
+                    // Eccentricity and Semi-Major Axis
+                    else
+                    {
+                        periapsis = semiMajorAxis * (1.0 - eccentricity);
+                        apoapsis = semiMajorAxis * (1.0 + eccentricity);
+                    }
                 }
 
                 orbitalPeriod = 2.0 * Math.PI * Math.Sqrt(Math.Pow(semiMajorAxis, 3.0) / gravParam);

@@ -159,7 +159,7 @@ namespace SimpleOrbitCalculator
             int celestialSelectColumns = (int)Math.Ceiling(celestialBodies.Count / 20.0);
             float minCelestialSelectWidth = 100f * celestialSelectColumns;
             float lockWidth = 150f;
-            float inputWidth = 150f;
+            float inputWidth = 200f;
             float synchPeriodButtonWidth = 25f;
             float calculateButtonWidth = 100f;
 
@@ -169,6 +169,8 @@ namespace SimpleOrbitCalculator
             GUILayout.Label("Select a Body:");
             selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, celestialSelectColumns);
             GUILayout.EndVertical();
+
+            GUILayout.Space(20);
 
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 
