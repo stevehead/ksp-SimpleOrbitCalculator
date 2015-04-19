@@ -29,3 +29,6 @@ Note: Because the calculation will fill in other elements that you did not choos
 ### Will not implement
 * Interplanetary transfers (there already exists such a mod: [Transfer Window Planner](http://forum.kerbalspaceprogram.com/threads/93115)).
 * Plane change calculations: somewhat out of scope of what the mod is intended for.
+
+### License
+This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
