@@ -172,7 +172,7 @@ namespace SimpleOrbitCalculator
 
             if (inputElements.Contains("semiMajorAxis") && inputElements.Contains("orbitalPeriod"))
             {
-                throw new OrbitalElementExecption("Semi-major-axis and orbital period creates an ambiguous case.");
+                throw new OrbitalElementExecption("Semi-major axis and orbital period creates an ambiguous case.");
             }
         }
 
@@ -195,7 +195,7 @@ namespace SimpleOrbitCalculator
 
             if (semiMajorAxis <= 0)
             {
-                throw new OrbitalElementExecption("Semi-major-axis must be greater than 0.");
+                throw new OrbitalElementExecption("Semi-major axis must be greater than 0.");
             }
 
             if (orbitalPeriod <= 0)
