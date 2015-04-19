@@ -20,6 +20,7 @@ namespace SimpleOrbitCalculator
         private readonly double meanDarknessTime;
         private readonly double specificOrbitalEnergy;
 
+        public CelestialBody ParentBody { get { return parentBody; }}
         public double SemiMajorAxis { get { return semiMajorAxis; }}
         public double Eccentricity { get { return eccentricity; } }
         public double Apoapsis { get { return apoapsis; } }
