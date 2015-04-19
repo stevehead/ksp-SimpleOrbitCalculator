@@ -421,7 +421,7 @@ namespace SimpleOrbitCalculator
                 celestialSelectValues[i] = celestialBodies[i].name;
 
                 // If the body is the same as the current vessel's main body, set this as the initial selected index.
-                /*if (HighLogic.LoadedSceneIsFlight && celestialBodies[i] == FlightGlobals.ActiveVessel.mainBody)
+                if (HighLogic.LoadedSceneIsFlight && celestialBodies[i] == FlightGlobals.ActiveVessel.mainBody)
                 {
                     initialSelectedIndex = i;
                 }
@@ -429,7 +429,7 @@ namespace SimpleOrbitCalculator
                 else if (initialSelectedIndex < 0 && celestialBodies[i].name.Equals("Kerbin"))
                 {
                     initialSelectedIndex = i;
-                }*/
+                }
             }
 
             // If an initial selected index was found, set the selected index to it.
