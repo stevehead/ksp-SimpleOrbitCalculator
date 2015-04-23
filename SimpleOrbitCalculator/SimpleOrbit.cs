@@ -96,7 +96,7 @@ namespace SimpleOrbitCalculator
 
     public class SimpleOrbitBuilder
     {
-        private const double ApsidesMargin = 0.00001;
+        private const double EccentricityEpsilon = 0.00001;
 
         private readonly CelestialBody parentBody;
         private List<string> inputElements = new List<string>();
@@ -114,8 +114,9 @@ namespace SimpleOrbitCalculator
         public SimpleOrbit Build()
         {
             ValidateInputElements();
+            CalculateOneToOneElements();
             CalculateRemainingElements();
-            CleanPrecisions();
+            CleanEccentricityPrecision();
             ValidateAllElements();
             return new SimpleOrbit(parentBody, semiMajorAxis, eccentricity);
         }
@@ -219,131 +220,67 @@ namespace SimpleOrbitCalculator
 
         private void ValidateAllElements()
         {
-            if (apoapsis < periapsis)
+            if (eccentricity < 0)
             {
-                throw new OrbitalElementExecption("Apoapsis must be greater than or equal to the periapsis");
+                throw new OrbitalElementExecption("Resulting eccentricity cannot be less than 0.");
             }
 
-            if (apoapsis < 0 || periapsis < 0)
-            {
-                throw new OrbitalElementExecption("Apsides must be greater than 0.");
-            }
-
-            if (eccentricity < 0 || eccentricity > 1)
-            {
-                throw new OrbitalElementExecption("Eccentricity must be between 0 and 1.");
-            }
-
-            if (semiMajorAxis <= 0)
-            {
-                throw new OrbitalElementExecption("Semi-major axis must be greater than 0.");
-            }
-
-            if (orbitalPeriod <= 0)
-            {
-                throw new OrbitalElementExecption("Orbital period must be greater than 0.");
-            }
-
-            if (apoapsis > parentBody.sphereOfInfluence)
+            /*if (apoapsis > parentBody.sphereOfInfluence)
             {
                 throw new OrbitalElementExecption("Apoapsis located outside of SOI.");
+            }*/
+        }
+
+        private void CleanEccentricityPrecision()
+        {
+            if (Math.Abs(eccentricity) <= EccentricityEpsilon)
+            {
+                eccentricity = 0.0;
             }
         }
 
-        private void CleanPrecisions()
+        private void CalculateOneToOneElements()
         {
-            double allowedDifference = Math.Abs(periapsis * ApsidesMargin);
-
-            // If apoapsis and periapsis are almost equal, treat them as equal
-            if (Math.Abs(apoapsis - periapsis) <= allowedDifference)
+            if (inputElements.Contains("orbitalPeriod"))
             {
-                double average = (periapsis + apoapsis) / 2;
-                periapsis = average;
-                apoapsis = average;
-                semiMajorAxis = average;
-                eccentricity = 0.0;
-                orbitalPeriod = 2.0 * Math.PI * Math.Sqrt(Math.Pow(semiMajorAxis, 3.0) / parentBody.gravParameter);
+                semiMajorAxis = Math.Pow(parentBody.gravParameter * Math.Pow(orbitalPeriod / (2.0 * Math.PI), 2.0), 1.0 / 3.0);
+                inputElements.Add("semiMajorAxis");
             }
         }
 
         private void CalculateRemainingElements()
         {
-            double gravParam = parentBody.gravParameter;
-
-            if (!inputElements.Contains("orbitalPeriod"))
+            // We already have what we need if semi-major axis and eccentricity are set
+            if (inputElements.Contains("semiMajorAxis") && inputElements.Contains("eccentricity"))
             {
-                if (!inputElements.Contains("eccentricity"))
-                {
-                    // Apoapsis and Periapsis
-                    if (inputElements.Contains("apoapsis") && inputElements.Contains("periapsis"))
-                    {
-                        semiMajorAxis = (apoapsis + periapsis) / 2.0;
-                    }
-                    // Apoapsis and Semi-Major Axis
-                    else if (inputElements.Contains("apoapsis") && inputElements.Contains("semiMajorAxis"))
-                    {
-                        periapsis = 2.0 * semiMajorAxis - apoapsis;
-                    }
-                    // Periapsis and Semi-Major Axis
-                    else if (inputElements.Contains("periapsis") && inputElements.Contains("semiMajorAxis"))
-                    {
-                        apoapsis = 2.0 * semiMajorAxis - periapsis;
-                    }
-
-                    eccentricity = (apoapsis - periapsis) / (apoapsis + periapsis);
-                }
-                else
-                {
-                    if (!inputElements.Contains("semiMajorAxis"))
-                    {
-                        // Eccentricity and Apoapsis
-                        if (inputElements.Contains("apoapsis"))
-                        {
-                            periapsis = apoapsis * (1.0 - eccentricity) / (1.0 + eccentricity);
-                        }
-                        // Eccentricity and Periapsis
-                        else if (inputElements.Contains("periapsis"))
-                        {
-                            apoapsis = periapsis * (1.0 + eccentricity) / (1.0 - eccentricity);
-                        }
-
-                        semiMajorAxis = (apoapsis + periapsis) / 2.0;
-                    }
-                    // Eccentricity and Semi-Major Axis
-                    else
-                    {
-                        periapsis = semiMajorAxis * (1.0 - eccentricity);
-                        apoapsis = semiMajorAxis * (1.0 + eccentricity);
-                    }
-                }
-
-                orbitalPeriod = 2.0 * Math.PI * Math.Sqrt(Math.Pow(semiMajorAxis, 3.0) / gravParam);
+                return;
             }
-            else
+
+            // Apoapsis and Periapsis
+            if (inputElements.Contains("apoapsis") && inputElements.Contains("periapsis"))
             {
-                semiMajorAxis = Math.Pow(gravParam * Math.Pow(orbitalPeriod / (2.0 * Math.PI), 2.0), 1.0 / 3.0);
-
-                // Period and Eccentricity
-                if (inputElements.Contains("eccentricity"))
-                {
-                    periapsis = semiMajorAxis * (1.0 - eccentricity);
-                    apoapsis = semiMajorAxis * (1.0 + eccentricity);
-                }
-                else
-                {
-                    // Period and Apoapsis
-                    if (inputElements.Contains("apoapsis"))
-                    {
-                        periapsis = 2.0 * semiMajorAxis - apoapsis;
-                    }
-                    // Period and Periapsis
-                    else if (inputElements.Contains("periapsis"))
-                    {
-                        apoapsis = 2.0 * semiMajorAxis - periapsis;
-                    }
-
-                    eccentricity = (apoapsis - periapsis) / (apoapsis + periapsis);
-                }
+                semiMajorAxis = (apoapsis + periapsis) / 2.0;
+                eccentricity = (apoapsis - periapsis) / (apoapsis + periapsis);
+            }
+            // Apoapsis and Semi-Major Axis
+            else if (inputElements.Contains("apoapsis") && inputElements.Contains("semiMajorAxis"))
+            {
+                eccentricity = apoapsis / semiMajorAxis - 1.0;
+            }
+            // Periapsis and Semi-Major Axis
+            else if (inputElements.Contains("periapsis") && inputElements.Contains("semiMajorAxis"))
+            {
+                eccentricity = 1.0 - periapsis / semiMajorAxis;
+            }
+            // Eccentricity and Apoapsis
+            else if (inputElements.Contains("apoapsis") && inputElements.Contains("eccentricity"))
+            {
+                semiMajorAxis = apoapsis / (1.0 + eccentricity);
+            }
+            // Eccentricity and Periapsis
+            else if (inputElements.Contains("periapsis") && inputElements.Contains("eccentricity"))
+            {
+                semiMajorAxis = periapsis / (1.0 - eccentricity);
             }
         }
     }
