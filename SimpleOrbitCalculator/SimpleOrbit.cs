@@ -11,30 +11,42 @@ namespace SimpleOrbitCalculator
         private readonly CelestialBody parentBody;
         private readonly double semiMajorAxis;
         private readonly double eccentricity;
+        private readonly double semiMinorAxis;
+        private readonly double semiLatusRectum;
+        private readonly double focalParameter;
+        private readonly double linearEccentricity;
         private readonly double apoapsis;
         private readonly double periapsis;
-        private readonly double orbitalPeriod;
         private readonly double apoapsisAltitude;
         private readonly double periapsisAltitude;
+        private readonly double orbitalPeriod;
         private readonly double apoapsisSpeed;
         private readonly double periapsisSpeed;
         private readonly double meanOrbitalSpeed;
-        private readonly double meanDarknessTime;
         private readonly double specificOrbitalEnergy;
+        private readonly double specificAngularMomentum;
+        private readonly double meanDarknessTime;
+        private readonly double maxDarknessTime;
         
         public CelestialBody ParentBody { get { return parentBody; }}
         public double SemiMajorAxis { get { return semiMajorAxis; }}
         public double Eccentricity { get { return eccentricity; } }
+        public double SemiMinorAxis { get { return semiMinorAxis; } }
+        public double SemiLatusRectum { get { return semiLatusRectum; } }
+        public double FocalParameter { get { return focalParameter; } }
+        public double LinearEccentricity { get { return linearEccentricity; } }
         public double Apoapsis { get { return apoapsis; } }
         public double Periapsis { get { return periapsis; } }
-        public double OrbitalPeriod { get { return orbitalPeriod; } }
         public double ApoapsisAltitude { get { return apoapsisAltitude; } }
         public double PeriapsisAltitude { get { return periapsisAltitude; } }
+        public double OrbitalPeriod { get { return orbitalPeriod; } }
         public double ApoapsisSpeed { get { return apoapsisSpeed; } }
         public double PeriapsisSpeed { get { return periapsisSpeed; } }
         public double MeanOrbitalSpeed { get { return meanOrbitalSpeed; } }
-        public double MeanDarknessTime { get { return meanDarknessTime; } }
         public double SpecificOrbitalEnergy { get { return specificOrbitalEnergy; } }
+        public double SpecificAngularMomentum { get { return specificAngularMomentum; } }
+        public double MaxDarknessTime { get { return maxDarknessTime; } }
+        public double MeanDarknessTime { get { return meanDarknessTime; } }
 
         /// <summary>
         /// ScalerType are the various scalers used by the orbit elements.
@@ -42,25 +54,41 @@ namespace SimpleOrbitCalculator
         /// </summary>
         public enum ScalerType { Distance, Speed, Time, SpecificEnergy };
 
-        internal SimpleOrbit(CelestialBody parentBody, double semiMajorAxis, double eccentricity, double apoapsis, double periapsis, double orbitalPeriod)
+        internal SimpleOrbit(CelestialBody parentBody, double semiMajorAxis, double eccentricity)
         {
             this.parentBody = parentBody;
             this.semiMajorAxis = semiMajorAxis;
             this.eccentricity = eccentricity;
-            this.apoapsis = apoapsis;
-            this.periapsis = periapsis;
-            this.orbitalPeriod = orbitalPeriod;
-            this.apoapsisAltitude = apoapsis - parentBody.Radius;
-            this.periapsisAltitude = periapsis - parentBody.Radius;
-            this.apoapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / apoapsis - 1.0 / semiMajorAxis));
-            this.periapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / periapsis - 1.0 / semiMajorAxis));
-            this.meanOrbitalSpeed = Math.Sqrt(parentBody.gravParameter / semiMajorAxis) * (
+
+            // Ellipse features
+            semiMinorAxis = semiMajorAxis * Math.Sqrt(1.0 - Math.Pow(eccentricity, 2.0));
+            semiLatusRectum = Math.Pow(semiMinorAxis, 2.0) / semiMajorAxis;
+            focalParameter = semiLatusRectum / eccentricity;
+            linearEccentricity = semiMajorAxis * eccentricity;
+
+            // Apside calculations
+            apoapsis = semiMajorAxis * (1.0 + eccentricity);
+            periapsis = semiMajorAxis * (1.0 - eccentricity);
+            apoapsisAltitude = apoapsis - parentBody.Radius;
+            periapsisAltitude = periapsis - parentBody.Radius;
+
+            // Time calculations
+            orbitalPeriod = 2.0 * Math.PI * Math.Sqrt(Math.Pow(semiMajorAxis, 3.0) / parentBody.gravParameter);
+
+            // Speed calculations
+            apoapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / apoapsis - 1.0 / semiMajorAxis));
+            periapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / periapsis - 1.0 / semiMajorAxis));
+            meanOrbitalSpeed = Math.Sqrt(parentBody.gravParameter / semiMajorAxis) * (
                 1.0 - 1.0 / 4.0 * Math.Pow(eccentricity, 2.0)
                 - 3.0 / 64.0 * Math.Pow(eccentricity, 4.0)
                 - 5.0 / 256.0 * Math.Pow(eccentricity, 6.0)
                 - 175.0 / 16384.0 * Math.Pow(eccentricity, 8.0));
-            this.meanDarknessTime = orbitalPeriod * Math.Asin(parentBody.Radius / semiMajorAxis) / Math.PI;
-            this.specificOrbitalEnergy = -parentBody.gravParameter / (2.0 * semiMajorAxis);
+            
+            // Misc. calculations
+            specificOrbitalEnergy = -parentBody.gravParameter / (2.0 * semiMajorAxis);
+            specificAngularMomentum = Math.Sqrt(semiLatusRectum * parentBody.gravParameter);
+            meanDarknessTime = orbitalPeriod * Math.Asin(parentBody.Radius / semiMajorAxis) / Math.PI;
+            maxDarknessTime = 2.0 * semiMajorAxis * semiMinorAxis * (Math.Asin(parentBody.Radius / semiMinorAxis) + eccentricity * parentBody.Radius / semiMinorAxis) / specificAngularMomentum;
         }
 
         
@@ -89,7 +117,7 @@ namespace SimpleOrbitCalculator
             CalculateRemainingElements();
             CleanPrecisions();
             ValidateAllElements();
-            return new SimpleOrbit(parentBody, semiMajorAxis, eccentricity, apoapsis, periapsis, orbitalPeriod);
+            return new SimpleOrbit(parentBody, semiMajorAxis, eccentricity);
         }
 
         public SimpleOrbitBuilder SetSemiMajorAxis(double semiMajorAxis)

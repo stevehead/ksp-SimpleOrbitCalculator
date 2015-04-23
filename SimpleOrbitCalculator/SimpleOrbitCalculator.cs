@@ -253,7 +253,6 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Apoapsis Speed: " + GUIUtilities.ParseOrbitElement(currentOrbit.ApoapsisSpeed, SimpleOrbit.ScalerType.Speed));
                 GUILayout.Label("Eccentricity: " + GUIUtilities.ParseOrbitElement(currentOrbit.Eccentricity));
                 GUILayout.Label("Mean Orbit Speed: " + GUIUtilities.ParseOrbitElement(currentOrbit.MeanOrbitalSpeed, SimpleOrbit.ScalerType.Speed));
-                GUILayout.Label("Darkness Length: " + GUIUtilities.ParseOrbitElement(currentOrbit.MeanDarknessTime, SimpleOrbit.ScalerType.Time));
                 GUILayout.EndVertical();
             }
             GUILayout.EndHorizontal();
