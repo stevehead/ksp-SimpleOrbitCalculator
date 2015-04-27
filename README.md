@@ -34,6 +34,8 @@ Note: Because the calculation will fill in other elements that you did not choos
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
 
 ### Changelog
+4/27/2015 - **v1.1.1** - KSP 1.0 compatibility update.
+
 4/23/2015 - **v1.1.0** *Beautiful Biscuit* - Darkness time is now the longest amount of time that could be possibly spent in darkness (was originally assuming a circular orbit). Removed restrictions regarding hyperbolic trajectories (may result in some weird output numbers). Some code cleanup to prepare for future input values.
 
-4/19/2105 - **v1.0.0** *Allergic Applesauce* - Initial release for KSP 0.90
+4/19/2105 - **v1.0.0** *Allergic Applesauce* - Initial release for KSP 0.90.
