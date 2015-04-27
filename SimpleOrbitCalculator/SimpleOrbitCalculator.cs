@@ -62,6 +62,9 @@ namespace SimpleOrbitCalculator
 
         void RemoveFromAppLauncher()
         {
+#if DEBUG
+            Debug.Log(PluginName + " :: RemoveFromAppLauncher called.");
+#endif
             if (appLauncherButton != null)
             {
                 ApplicationLauncher.Instance.RemoveApplication(appLauncherButton);
@@ -69,11 +72,17 @@ namespace SimpleOrbitCalculator
                 GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherDestroyed);
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
+#if DEBUG
+                Debug.Log(PluginName + " :: RemoveFromAppLauncher removal logic completed.");
+#endif
             }
         }
 
         void OnGUIAppLauncherReady()
         {
+#if DEBUG
+            Debug.Log(PluginName + " :: OnGuiAppLauncherReady called.");
+#endif
             if (ApplicationLauncher.Ready && appLauncherButton == null)
             {
                 string pluginIconButtonStockPath = String.Format("{0}/Textures/{1}", PluginDirectoryName, PluginIconButtonStock);
@@ -83,11 +92,17 @@ namespace SimpleOrbitCalculator
                     null, null,
                     ApplicationLauncher.AppScenes.ALWAYS,
                     (Texture)GameDatabase.Instance.GetTexture(pluginIconButtonStockPath, false));
+#if DEBUG
+                Debug.Log(PluginName + " :: AppLauncher menu item added.");
+#endif
             }
         }
 
         void OnGuiAppLauncherDestroyed()
         {
+#if DEBUG
+            Debug.Log(PluginName + " :: OnGuiAppLauncherDestroyed called.");
+#endif
             if (appLauncherButton != null)
             {
                 RemoveFromAppLauncher();
@@ -96,6 +111,9 @@ namespace SimpleOrbitCalculator
 
         void OnGameSceneLoadRequestedForAppLauncher(GameScenes sceneToLoad)
         {
+#if DEBUG
+            Debug.Log(PluginName + " :: OnGameSceneLoadRequestedForAppLauncher called.");
+#endif
             if (appLauncherButton != null)
             {
                 RemoveFromAppLauncher();
@@ -114,8 +132,14 @@ namespace SimpleOrbitCalculator
 
         public void Awake()
         {
+#if DEBUG
+            Debug.Log(PluginName + " :: is now awake.");
+#endif
             if (appLauncherButton == null)
             {
+#if DEBUG
+                Debug.Log(PluginName + " :: AppLauncher setup.");
+#endif
                 GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
