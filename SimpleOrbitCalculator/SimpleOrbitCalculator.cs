@@ -68,7 +68,6 @@ namespace SimpleOrbitCalculator
             if (appLauncherButton != null)
             {
                 ApplicationLauncher.Instance.RemoveApplication(appLauncherButton);
-                appLauncherButton = null;
                 GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherDestroyed);
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequestedForAppLauncher);
