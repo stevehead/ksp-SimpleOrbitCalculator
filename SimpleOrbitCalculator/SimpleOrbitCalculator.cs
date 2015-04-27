@@ -89,7 +89,8 @@ namespace SimpleOrbitCalculator
                     OnAppLaunchToggleOn, OnAppLaunchToggleOff,
                     null, null,
                     null, null,
-                    ApplicationLauncher.AppScenes.ALWAYS,
+                    ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPACECENTER
+                        | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB,
                     (Texture)GameDatabase.Instance.GetTexture(pluginIconButtonStockPath, false));
 #if DEBUG
                 Debug.Log(PluginName + " :: AppLauncher menu item added.");
