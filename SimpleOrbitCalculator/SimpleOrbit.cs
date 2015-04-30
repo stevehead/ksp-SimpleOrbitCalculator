@@ -91,7 +91,58 @@ namespace SimpleOrbitCalculator
             maxDarknessTime = 2.0 * semiMajorAxis * semiMinorAxis * (Math.Asin(parentBody.Radius / semiMinorAxis) + eccentricity * parentBody.Radius / semiMinorAxis) / specificAngularMomentum;
         }
 
-        
+        public override string ToString()
+        {
+            return ToString(false);
+        }
+
+        public string ToString(bool userApsideAltitude)
+        {
+            string periapsisText, apoapsisText;
+            if (userApsideAltitude)
+            {
+                periapsisText = GUIUtilities.ParseOrbitElement(PeriapsisAltitude, ScalerType.Distance);
+                apoapsisText = GUIUtilities.ParseOrbitElement(ApoapsisAltitude, ScalerType.Distance);
+            }
+            else
+            {
+                periapsisText = GUIUtilities.ParseOrbitElement(Periapsis, ScalerType.Distance);
+                apoapsisText = GUIUtilities.ParseOrbitElement(Apoapsis, ScalerType.Distance);
+            }
+            return parentBody.name + ": " + periapsisText + " x " + apoapsisText;
+        }
+
+        public static double CalculateHohmannTransferDeltaV(SimpleOrbit orbit1, SimpleOrbit orbit2)
+        {
+            SimpleOrbit lowerEnergyOrbit, higherEnergyOrbit, transferOrbit;
+            double deltaV = 0.0;
+
+            if (orbit1.ParentBody != orbit2.ParentBody)
+            {
+                throw new ArgumentException("Input orbits must have same parent body.");
+            }
+
+            if (orbit1.SpecificOrbitalEnergy < orbit2.SpecificOrbitalEnergy)
+            {
+                lowerEnergyOrbit = orbit1;
+                higherEnergyOrbit = orbit2;
+            }
+            else
+            {
+                lowerEnergyOrbit = orbit2;
+                higherEnergyOrbit = orbit1;
+            }
+
+            SimpleOrbitBuilder transferOrbitBuilder = new SimpleOrbitBuilder(orbit1.ParentBody);
+            transferOrbitBuilder.SetPeriapsis(lowerEnergyOrbit.Periapsis);
+            transferOrbitBuilder.SetApoapsis(higherEnergyOrbit.Periapsis);
+            transferOrbit = transferOrbitBuilder.Build();
+
+            deltaV += Math.Abs(transferOrbit.PeriapsisSpeed - lowerEnergyOrbit.PeriapsisSpeed);
+            deltaV += Math.Abs(higherEnergyOrbit.PeriapsisSpeed - transferOrbit.ApoapsisSpeed);
+
+            return deltaV;
+        }
     }
 
     public class SimpleOrbitBuilder

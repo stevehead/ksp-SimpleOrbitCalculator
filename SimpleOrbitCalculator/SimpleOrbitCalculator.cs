@@ -36,6 +36,8 @@ namespace SimpleOrbitCalculator
         private string errorText = "";
 
         private SimpleOrbit currentOrbit = null;
+        private SimpleOrbit savedOrbit1 = null;
+        private SimpleOrbit savedOrbit2 = null;
 
         private static ApplicationLauncherButton appLauncherButton = null;
 
@@ -186,7 +188,9 @@ namespace SimpleOrbitCalculator
             float inputWidth = 200f;
             float synchPeriodButtonWidth = 25f;
             float calculateButtonWidth = 100f;
+            float saveOrbitButtonWidth = 125f;
 
+            #region MainWindow : Main Area
             GUILayout.BeginHorizontal();
 
             GUILayout.BeginVertical(GUILayout.MinWidth(minCelestialSelectWidth), GUILayout.ExpandWidth(true));
@@ -196,6 +200,7 @@ namespace SimpleOrbitCalculator
 
             GUILayout.Space(20);
 
+            #region MainWindow : Main Input Area
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 
             GUILayout.BeginHorizontal();
@@ -253,7 +258,7 @@ namespace SimpleOrbitCalculator
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(50);
+            GUILayout.Space(25);
 
             GUILayout.BeginHorizontal();
             if (errorText != "")
@@ -282,15 +287,97 @@ namespace SimpleOrbitCalculator
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(50);
+            #region MainWindow : Hohmann Transfer Calculator
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
+
+            if (currentOrbit != null)
+            {
+                GUILayout.Space(25);
+            }
+
+            GUILayout.BeginHorizontal();
+            if (currentOrbit == null)
+            {
+                GUI.enabled = false;
+            }
+            if (GUILayout.Button("Save as Orbit 1", GUILayout.Width(saveOrbitButtonWidth)))
+            {
+                savedOrbit1 = currentOrbit;
+            }
+            GUI.enabled = true;
+            if (savedOrbit1 != null)
+            {
+                if (GUILayout.Button("C", GUILayout.Width(synchPeriodButtonWidth)))
+                {
+                    savedOrbit1 = null;
+                }
+                GUILayout.Label(savedOrbit1.ToString(useAltitideAspides));
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (currentOrbit == null)
+            {
+                GUI.enabled = false;
+            }
+            if (GUILayout.Button("Save as Orbit 2", GUILayout.Width(saveOrbitButtonWidth)))
+            {
+                savedOrbit2 = currentOrbit;
+            }
+            GUI.enabled = true;
+            if (savedOrbit2 != null)
+            {
+                if (GUILayout.Button("C", GUILayout.Width(synchPeriodButtonWidth)))
+                {
+                    savedOrbit2 = null;
+                }
+                GUILayout.Label(savedOrbit2.ToString(useAltitideAspides));
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (savedOrbit1 != null && savedOrbit2 != null)
+            {
+                if (savedOrbit1.ParentBody == savedOrbit2.ParentBody)
+                {
+                    try
+                    {
+                        double hohmannTransferDeltaV = SimpleOrbit.CalculateHohmannTransferDeltaV(savedOrbit1, savedOrbit2);
+                        GUILayout.Label("Transfer Delta-V: " + GUIUtilities.ParseOrbitElement(hohmannTransferDeltaV, SimpleOrbit.ScalerType.Speed));
+                    }
+                    catch (ArgumentException e)
+                    {
+                        GUILayout.Label("Error: " + e.Message);
+                    }
+                }
+                else
+                {
+                    GUILayout.Label("Parent bodies of saved orbits do not match.");
+                }
+                
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            #endregion
+
+            GUILayout.EndVertical();
+            #endregion
+
+            #region MainWindow : Options Area
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
             GUILayout.Label("Options");
 
             GUILayout.BeginHorizontal();
             useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
             GUILayout.EndHorizontal();
-
             GUILayout.EndVertical();
+            #endregion
+
             GUILayout.EndHorizontal();
+            #endregion
 
             GUI.DragWindow();
         }
