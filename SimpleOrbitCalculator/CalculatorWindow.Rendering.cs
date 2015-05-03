@@ -13,30 +13,61 @@ namespace SimpleOrbitCalculator
         /// </summary>
         private void RenderWindow(int windowId)
         {
+            // Begin Main Window
             GUILayout.BeginHorizontal();
 
-            // Left Column
+            // Begin Left Column
             GUILayout.BeginVertical(GUILayout.MinWidth(MinCelestialSelectAreaWidth), GUILayout.ExpandWidth(true));
             RenderCelestialSelectArea();
             GUILayout.EndVertical();
+            // End Left Column
 
             GUILayout.Space(20);
 
-            // Center Column
+            // Begin Right Column
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-            RenderMainInputArea();
-            GUILayout.Space(25);
-            RenderMainOutputArea();
-            GUILayout.Space(25);
-            RenderHohmannTransferArea();
-            GUILayout.EndVertical();
 
-            // Right Column
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            // Begin Right Column, Top Row
+            GUILayout.BeginHorizontal();
+
+            // Begin Right Column, Top Row, Left Column
+            GUILayout.BeginVertical();
+            RenderMainInputArea();
+            GUILayout.EndVertical();
+            // End Right Column, Top Row, Left Column
+
+            // Begin Right Column, Top Row, Right Column
+            GUILayout.BeginVertical();
             RenderOptionsArea();
             GUILayout.EndVertical();
+            // End Right Column, Top Row, Right Column
 
             GUILayout.EndHorizontal();
+            // End Right Column, Top Row
+
+            GUILayout.Space(25);
+
+            // Begin Right Column, Middle Row
+            GUILayout.BeginHorizontal();
+            RenderMainOutputArea();
+            GUILayout.EndHorizontal();
+            // End Right Column, Middle Row
+
+            GUILayout.Space(25);
+
+            // Begin Right Column, Bottom Row
+            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
+            RenderHohmannTransferArea();
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            // End Right Column, Bottom Row
+
+            GUILayout.EndVertical();
+            // End Right Column
+
+            GUILayout.EndHorizontal();
+            // End MainWindow
 
             GUI.DragWindow();
         }
@@ -59,16 +90,12 @@ namespace SimpleOrbitCalculator
             bool lockLimitReached = IsLockLimitReached();
 
             // Displays the current celestial.
-            GUILayout.BeginHorizontal();
             GUILayout.Label("Current Body: " + celestialSelectValues[selectedCelestialIndex]);
-            GUILayout.EndHorizontal();
 
             // Use current active vessel's orbit button.
             if (HighLogic.LoadedSceneIsFlight)
             {
-                GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Use Current Orbit", GUILayout.Width(UseCurrentOrbitButtonWidth))) LoadActiveVesselOrbit();
-                GUILayout.EndHorizontal();
             }
 
             // Periapsis input.
@@ -121,15 +148,11 @@ namespace SimpleOrbitCalculator
             GUILayout.EndHorizontal();
 
             // Calculate orbit button.
-            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Calculate", GUILayout.Width(CalculateButtonWidth))) CalculateAndParseOrbit();
-            GUILayout.EndHorizontal();
         }
 
         private void RenderMainOutputArea()
         {
-            GUILayout.BeginHorizontal();
-
             // Display error if it exists.
             if (errorText != "") GUILayout.Label(errorText);
 
@@ -154,8 +177,6 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Max. Darkness Length: " + SOCUtilis.ParseOrbitElement(currentOrbit.MaxDarknessTime, SimpleOrbit.ScalerType.Time));
                 GUILayout.EndVertical();
             }
-
-            GUILayout.EndHorizontal();
         }
 
         private void RenderHohmannTransferArea()
@@ -185,7 +206,6 @@ namespace SimpleOrbitCalculator
             GUILayout.EndHorizontal();
 
             // Calculate the delta-V of transfer if valid.
-            GUILayout.BeginHorizontal();
             if (savedOrbit1 != null && savedOrbit2 != null)
             {
                 if (savedOrbit1.ParentBody == savedOrbit2.ParentBody)
@@ -206,7 +226,6 @@ namespace SimpleOrbitCalculator
                 }
 
             }
-            GUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -217,9 +236,7 @@ namespace SimpleOrbitCalculator
             GUILayout.Label("Options");
 
             // The Apsides altitude option.
-            GUILayout.BeginHorizontal();
             useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
-            GUILayout.EndHorizontal();
         }
 
         /// <summary>
