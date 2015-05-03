@@ -78,5 +78,31 @@ namespace SimpleOrbitCalculator
 
             return orbitBuilder.Build();
         }
+
+        /// <summary>
+        /// Loads, calculates and parses the current vessel's orbit.
+        /// </summary>
+        private void LoadActiveVesselOrbit()
+        {
+            // Current orbit of active vessel.
+            Orbit currentOrbit = FlightGlobals.ActiveVessel.orbit;
+
+            // Reset all user inputs.
+            ResetInputs();
+
+            // Find the index of the orbit's parent body.
+            selectedCelestialIndex = celestialBodies.IndexOf(currentOrbit.referenceBody);
+
+            // Get the eccentricity and semi-major axis.
+            eccentricityText = currentOrbit.eccentricity.ToString();
+            smaText = currentOrbit.semiMajorAxis.ToString();
+
+            // Lock the eccentricity and semi-major axis.
+            lockEccentricity = true;
+            lockSMA = true;
+
+            // Calculate and parse the orbit.
+            CalculateAndParseOrbit();
+        }
     }
 }

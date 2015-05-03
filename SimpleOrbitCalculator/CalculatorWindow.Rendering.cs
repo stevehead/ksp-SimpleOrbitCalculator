@@ -63,6 +63,14 @@ namespace SimpleOrbitCalculator
             GUILayout.Label("Current Body: " + celestialSelectValues[selectedCelestialIndex]);
             GUILayout.EndHorizontal();
 
+            // Use current active vessel's orbit button.
+            if (HighLogic.LoadedSceneIsFlight)
+            {
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Use Current Orbit", GUILayout.Width(UseCurrentOrbitButtonWidth))) LoadActiveVesselOrbit();
+                GUILayout.EndHorizontal();
+            }
+
             // Periapsis input.
             GUILayout.BeginHorizontal();
             if (!lockPeriapsis && lockLimitReached) GUI.enabled = false;
@@ -229,6 +237,25 @@ namespace SimpleOrbitCalculator
             if (lockPeriod) countLocks++;
             if (countLocks >= 2) lockLimitReached = true;
             return lockLimitReached;
+        }
+
+        /// <summary>
+        /// Resets all user inputs.
+        /// </summary>
+        private void ResetInputs()
+        {
+            lockPeriapsis = false;
+            lockApoapsis = false;
+            lockEccentricity = false;
+            lockSMA = false;
+            lockPeriod = false;
+            periapsisText = "";
+            apoapsisText = "";
+            eccentricityText = "";
+            smaText = "";
+            periodText = "";
+            errorText = "";
+            currentOrbit = null;
         }
     }
 }

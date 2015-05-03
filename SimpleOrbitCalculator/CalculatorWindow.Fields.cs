@@ -21,7 +21,12 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// The width of the celestial individual select buttons.
         /// </summary>
-        private const float CelestialSelectWidth = 100f;
+        private const float CelestialSelectWidth = 100F;
+
+        /// <summary>
+        /// The width of the use current orbit button.
+        /// </summary>
+        private const float UseCurrentOrbitButtonWidth = 175F;
 
         /// <summary>
         /// The width of the toggle for the lockeable inputs.
