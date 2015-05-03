@@ -7,24 +7,32 @@ The plugin pulls all celestial bodies known to KSP during runtime of the game; t
 ### Incompatibilities
 This plugin could possibly give false results when using a mod that can alter the celestial bodies during gameplay, such as HyperEdit. Use with caution.
 
-### How to use
+### How to use the orbit calculator
 1. Select the celestial body on the left.
 2. To the right of the celestial bodies, select two orbital elements (you cannot select both semi-major axis and orbital period; it would create an ambiguous case). The other elements will be disabled from input at this point.
 3. As an option, you can use either apoapsis/periapsis as altitudes above sea level of parent body or as distances from the center of the parent body. Just toggle the *Use Altitudes for Apsides* option near the bottom under Options.
-4. Enter your target values. The "S" button on the same row of the orbital period will set the orbital period to the parent body's rotation period (useful for synchronous orbits).
+4. Enter your target values. The *S* button on the same row of the orbital period will set the orbital period to the parent body's rotation period (useful for synchronous orbits).
 5. Click the *Calculate* button, which will fill in the other elements and display below more in-depth information of the calculated orbit. Any errors will be reported.
+6. Optionally, if you are currently in a flight scene, you can click the *Use Current Orbit* button to use your current orbit.
 
 Note: Because the calculation will fill in other elements that you did not choose, you will be free to use those easily in other calculations. Just de-select the elements you do not need, and select the new ones. This is very useful for calculating Hohmann transfers.
+
+### How to use the Hohmann transfer calculator
+1. Once you have calculated an orbit above, click either *Save as Orbit 1* or *Save as Orbit 2*.
+2. When two orbits are saved that have the same parent body, the delta-v for the transfer will be calculated and displayed below.
+3. Click the *C* buttons to clear their respective orbits.
 
 ### Current features
 * Will automatically detect all celestial bodies known to KSP and their properties, including changes/additions by RSS or Planet Factory like mods.
 * Allowed inputs include: Apoapsis, Periapsis, Semi-Major Axis, Eccentricity, Orbital Period.
 * Other information displayed after calculation: Orbital Speeds at Apoapsis and Periapsis, Mean Orbital Speed, Sphere of Influence of Parent Body, Mean Darkness Length (useful for Remote Tech satellite electric charge calculations).
+* Can use your current vessel's orbit as input.
+* Can save two orbits to calculate the delta-v required for a Hohmann transfer.
 
 ### Upcoming features
-* A better UI!
+* A better UI!... still.
 * Possibly more input values.
-* Ability to save two orbits around the same parent body, and calculate the delta-V required for the Hohmann transfer.
+* Ability to use your target vessel's orbit as input.
 
 ### Will not implement
 * Interplanetary transfers (there already exists such a mod: [Transfer Window Planner](http://forum.kerbalspaceprogram.com/threads/93115)).
@@ -34,6 +42,8 @@ Note: Because the calculation will fill in other elements that you did not choos
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
 
 ### Changelog
+5/3/2015 - **v1.2.0** *Cowardly Cheddar* - Can save calculated orbits to calculate the Hohmann transfer delta-v. While in flight scenes, can use your active vessel's orbit as input. Code cleanup for the AppLauncher stuff (thanks for the help stupid_chris!). Code cleanup overall.
+
 4/27/2015 - **v1.1.1** - KSP 1.0 compatibility update.
 
 4/23/2015 - **v1.1.0** *Beautiful Biscuit* - Darkness time is now the longest amount of time that could be possibly spent in darkness (was originally assuming a circular orbit). Removed restrictions regarding hyperbolic trajectories (may result in some weird output numbers). Some code cleanup to prepare for future input values.
