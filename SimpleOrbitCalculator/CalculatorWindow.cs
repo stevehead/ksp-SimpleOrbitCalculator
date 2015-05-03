@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace SimpleOrbitCalculator
 {
-    class CalculatorWindow
+    internal class CalculatorWindow : MonoBehaviour
     {
         /// <summary>
-        /// The singleton instance.
+        /// The title of the calculator's window.
         /// </summary>
-        private static CalculatorWindow instance;
+        private const string WindowTitle = SimpleOrbitCalculatorController.PluginName;
 
         /// <summary>
         /// The total number of celestials per column in select area.
@@ -47,6 +47,21 @@ namespace SimpleOrbitCalculator
         /// The width of the save orbit buttons.
         /// </summary>
         private const float SaveOrbitButtonWidth = 125F;
+
+        /// <summary>
+        /// The unique ID of the window.
+        /// </summary>
+        private int id;
+
+        /// <summary>
+        /// Is the window open?
+        /// </summary>
+        private bool isWindowOpen = true;
+
+        /// <summary>
+        /// Position of the calculator's window.
+        /// </summary>
+        private Rect windowPosition;
 
         /// <summary>
         /// List of known celestial bodies in the solar system.
@@ -139,21 +154,6 @@ namespace SimpleOrbitCalculator
         private SimpleOrbit savedOrbit2 = null;
 
         /// <summary>
-        /// Singleton instance.
-        /// </summary>
-        public static CalculatorWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new CalculatorWindow();
-                }
-                return instance;
-            }
-        }
-
-        /// <summary>
         /// The number of columns the celestial bodies will be in.
         /// </summary>
         private int CelestialSelectColumns
@@ -170,17 +170,77 @@ namespace SimpleOrbitCalculator
         }
 
         /// <summary>
-        /// Main constructor.
+        /// Called when the calculator is being loaded.
         /// </summary>
-        private CalculatorWindow()
+        public void Awake()
         {
+            // Window setup.
+            id = Guid.NewGuid().GetHashCode();
+            windowPosition = new Rect(100, 100, 800, 465);
+
+            // Load celestials.
             LoadAllCelestialInformation();
+
+            // Add event handlers.
+            GameEvents.onShowUI.Add(ShowUI);
+            GameEvents.onHideUI.Add(HideUI);
+            GameEvents.onGameSceneLoadRequested.Add(GameSceneLoadRequested);
+        }
+
+        /// <summary>
+        /// Called when destroyed.
+        /// </summary>
+        public void OnDestroy()
+        {
+            // Remove event handlers.
+            GameEvents.onShowUI.Remove(ShowUI);
+            GameEvents.onHideUI.Remove(HideUI);
+            GameEvents.onGameSceneLoadRequested.Remove(GameSceneLoadRequested);
+
+            // Need to tell the app launcher to turn off the button.
+            SimpleOrbitCalculatorController.SetApplauncherButtonFalse();
+        }
+
+        /// <summary>
+        /// Called for rendering and handling the GUI.
+        /// </summary>
+        public void OnGUI()
+        {
+            if (isWindowOpen)
+            {
+                windowPosition = GUILayout.Window(id, windowPosition, RenderWindow, WindowTitle);
+            }
+        }
+
+        /// <summary>
+        /// Shows the UI.
+        /// </summary>
+        private void ShowUI()
+        {
+            isWindowOpen = true;
+        }
+
+        /// <summary>
+        /// Hides the UI.
+        /// </summary>
+        private void HideUI()
+        {
+            isWindowOpen = false;
+        }
+
+        /// <summary>
+        /// Hides the UI during game scene change.
+        /// </summary>
+        /// <param name="newGameScene">the new game scene</param>
+        private void GameSceneLoadRequested(GameScenes newGameScene)
+        {
+            HideUI();
         }
 
         /// <summary>
         /// The main method that renders the window.
         /// </summary>
-        public void Render()
+        private void RenderWindow(int windowId)
         {
             GUILayout.BeginHorizontal();
 
