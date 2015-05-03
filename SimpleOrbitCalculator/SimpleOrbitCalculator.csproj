@@ -48,6 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CalculatorWindow.cs" />
+    <Compile Include="CalculatorWindow.Celestials.cs" />
+    <Compile Include="CalculatorWindow.Fields.cs" />
+    <Compile Include="CalculatorWindow.OrbitCalculations.cs" />
+    <Compile Include="CalculatorWindow.Rendering.cs" />
     <Compile Include="SimpleOrbit.cs" />
     <Compile Include="SimpleOrbitCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
