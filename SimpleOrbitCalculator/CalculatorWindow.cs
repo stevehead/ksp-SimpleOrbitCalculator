@@ -8,30 +8,139 @@ namespace SimpleOrbitCalculator
 {
     class CalculatorWindow
     {
+        /// <summary>
+        /// The singleton instance.
+        /// </summary>
         private static CalculatorWindow instance;
 
+        /// <summary>
+        /// The total number of celestials per column in select area.
+        /// </summary>
+        private const int MaximumCelestialsPerColumn = 20;
+
+        /// <summary>
+        /// The width of the celestial individual select buttons.
+        /// </summary>
+        private const float CelestialSelectWidth = 100f;
+
+        /// <summary>
+        /// The width of the toggle for the lockeable inputs.
+        /// </summary>
+        private const float LockWidth = 150F;
+
+        /// <summary>
+        /// The width of the text input fields.
+        /// </summary>
+        private const float InputWidth = 200F;
+
+        /// <summary>
+        /// The width of single char buttons.
+        /// </summary>
+        private const float CharButtonWidth = 25F;
+
+        /// <summary>
+        /// The width of the calculate button.
+        /// </summary>
+        private const float CalculateButtonWidth = 100F;
+
+        /// <summary>
+        /// The width of the save orbit buttons.
+        /// </summary>
+        private const float SaveOrbitButtonWidth = 125F;
+
+        /// <summary>
+        /// List of known celestial bodies in the solar system.
+        /// </summary>
         private List<CelestialBody> celestialBodies;
+
+        /// <summary>
+        /// The array of celestial's names for the celestial select area.
+        /// </summary>
         private string[] celestialSelectValues;
+
+        /// <summary>
+        /// The current selected celestial index.
+        /// </summary>
         private int selectedCelestialIndex = 0;
 
+        /// <summary>
+        /// Is periapsis locked?
+        /// </summary>
         private bool lockPeriapsis = false;
+
+        /// <summary>
+        /// Is apoapsis locked?
+        /// </summary>
         private bool lockApoapsis = false;
+
+        /// <summary>
+        /// Is eccentricity locked?
+        /// </summary>
         private bool lockEccentricity = false;
+
+        /// <summary>
+        /// Is semi-major axis locked?
+        /// </summary>
         private bool lockSMA = false;
+
+        /// <summary>
+        /// Is orbital period locked?
+        /// </summary>
         private bool lockPeriod = false;
+
+        /// <summary>
+        /// Is altitude-based apsides being used?
+        /// </summary>
         private bool useAltitideAspides = true;
 
+        /// <summary>
+        /// Periapsis input.
+        /// </summary>
         private string periapsisText = "";
+
+        /// <summary>
+        /// Apoapsis input.
+        /// </summary>
         private string apoapsisText = "";
+
+        /// <summary>
+        /// Eccentricity input.
+        /// </summary>
         private string eccentricityText = "";
+
+        /// <summary>
+        /// Semi-major axis input.
+        /// </summary>
         private string smaText = "";
+
+        /// <summary>
+        /// Orbital period input.
+        /// </summary>
         private string periodText = "";
+
+        /// <summary>
+        /// Calculate orbit error text.
+        /// </summary>
         private string errorText = "";
 
+        /// <summary>
+        /// The currently caclulated orbit.
+        /// </summary>
         private SimpleOrbit currentOrbit = null;
+
+        /// <summary>
+        /// The current saved orbit 1.
+        /// </summary>
         private SimpleOrbit savedOrbit1 = null;
+
+        /// <summary>
+        /// The current saved orbit 2.
+        /// </summary>
         private SimpleOrbit savedOrbit2 = null;
 
+        /// <summary>
+        /// Singleton instance.
+        /// </summary>
         public static CalculatorWindow Instance
         {
             get
@@ -44,107 +153,148 @@ namespace SimpleOrbitCalculator
             }
         }
 
+        /// <summary>
+        /// The number of columns the celestial bodies will be in.
+        /// </summary>
+        private int CelestialSelectColumns
+        {
+            get { return (int)Math.Ceiling(celestialBodies.Count / (1.0 * MaximumCelestialsPerColumn)); }
+        }
+
+        /// <summary>
+        /// The minimum width of the celestial select area.
+        /// </summary>
+        private float MinCelestialSelectAreaWidth
+        {
+            get { return CelestialSelectWidth * CelestialSelectColumns; }
+        }
+
+        /// <summary>
+        /// Main constructor.
+        /// </summary>
         private CalculatorWindow()
         {
             LoadAllCelestialInformation();
         }
 
+        /// <summary>
+        /// The main method that renders the window.
+        /// </summary>
         public void Render()
         {
-            // Need to deterime how many "locks" were used on the GUI inputs. We should not have more than 2.
-            int countLocks = 0;
-            bool lockLimitReached = false;
-            if (lockPeriapsis) countLocks++;
-            if (lockApoapsis) countLocks++;
-            if (lockEccentricity) countLocks++;
-            if (lockSMA) countLocks++;
-            if (lockPeriod) countLocks++;
-            if (countLocks >= 2) lockLimitReached = true;
-
-            // Window Settings - TODO: make as class constants?
-            int celestialSelectColumns = (int)Math.Ceiling(celestialBodies.Count / 20.0);
-            float minCelestialSelectWidth = 100f * celestialSelectColumns;
-            float lockWidth = 150f;
-            float inputWidth = 200f;
-            float synchPeriodButtonWidth = 25f;
-            float calculateButtonWidth = 100f;
-            float saveOrbitButtonWidth = 125f;
-
-            #region MainWindow : Main Area
             GUILayout.BeginHorizontal();
 
-            GUILayout.BeginVertical(GUILayout.MinWidth(minCelestialSelectWidth), GUILayout.ExpandWidth(true));
-            GUILayout.Label("Select a Body:");
-            selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, celestialSelectColumns);
+            // Left Column
+            GUILayout.BeginVertical(GUILayout.MinWidth(MinCelestialSelectAreaWidth), GUILayout.ExpandWidth(true));
+            RenderCelestialSelectArea();
             GUILayout.EndVertical();
 
             GUILayout.Space(20);
 
-            #region MainWindow : Main Input Area
+            // Center Column
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            RenderMainInputArea();
+            GUILayout.Space(25);
+            RenderMainOutputArea();
+            GUILayout.Space(25);
+            RenderHohmannTransferArea();
+            GUILayout.EndVertical();
 
+            // Right Column
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            RenderOptionsArea();
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+
+            GUI.DragWindow();
+        }
+
+        /// <summary>
+        /// Renders the celestial select area.
+        /// </summary>
+        private void RenderCelestialSelectArea()
+        {
+            GUILayout.Label("Select a Body:");
+            selectedCelestialIndex = GUILayout.SelectionGrid(selectedCelestialIndex, celestialSelectValues, CelestialSelectColumns);
+        }
+
+        /// <summary>
+        /// Redners all of the user's input form.
+        /// </summary>
+        private void RenderMainInputArea()
+        {
+            // If the blank form fields are disabled.
+            bool lockLimitReached = IsLockLimitReached();
+
+            // Displays the current celestial.
             GUILayout.BeginHorizontal();
             GUILayout.Label("Current Body: " + celestialSelectValues[selectedCelestialIndex]);
             GUILayout.EndHorizontal();
 
+            // Periapsis input.
             GUILayout.BeginHorizontal();
             if (!lockPeriapsis && lockLimitReached) GUI.enabled = false;
-            lockPeriapsis = GUILayout.Toggle(lockPeriapsis, "Periapsis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
+            lockPeriapsis = GUILayout.Toggle(lockPeriapsis, "Periapsis (m)", GUILayout.Width(LockWidth), GUILayout.ExpandWidth(false));
             if (!lockPeriapsis) GUI.enabled = false;
-            periapsisText = GUILayout.TextField(periapsisText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
+            periapsisText = GUILayout.TextField(periapsisText, GUILayout.Width(InputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
+            // Apoapsis input.
             GUILayout.BeginHorizontal();
             if (!lockApoapsis && lockLimitReached) GUI.enabled = false;
-            lockApoapsis = GUILayout.Toggle(lockApoapsis, "Apoapsis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
+            lockApoapsis = GUILayout.Toggle(lockApoapsis, "Apoapsis (m)", GUILayout.Width(LockWidth), GUILayout.ExpandWidth(false));
             if (!lockApoapsis) GUI.enabled = false;
-            apoapsisText = GUILayout.TextField(apoapsisText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
+            apoapsisText = GUILayout.TextField(apoapsisText, GUILayout.Width(InputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
+            // Semi-major axis input.
             GUILayout.BeginHorizontal();
             if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
-            lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
+            lockSMA = GUILayout.Toggle(lockPeriod ? false : lockSMA, "Semi-Major Axis (m)", GUILayout.Width(LockWidth), GUILayout.ExpandWidth(false));
             if (!lockSMA) GUI.enabled = false;
-            smaText = GUILayout.TextField(smaText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
+            smaText = GUILayout.TextField(smaText, GUILayout.Width(InputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
+            // Eccentricity input.
             GUILayout.BeginHorizontal();
             if (!lockEccentricity && lockLimitReached) GUI.enabled = false;
-            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
+            lockEccentricity = GUILayout.Toggle(lockEccentricity, "Eccentricity", GUILayout.Width(LockWidth), GUILayout.ExpandWidth(false));
             if (!lockEccentricity) GUI.enabled = false;
-            eccentricityText = GUILayout.TextField(eccentricityText, GUILayout.Width(inputWidth), GUILayout.ExpandWidth(false));
+            eccentricityText = GUILayout.TextField(eccentricityText, GUILayout.Width(InputWidth), GUILayout.ExpandWidth(false));
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
+            // Orbital period input.
             GUILayout.BeginHorizontal();
             if ((!lockSMA && !lockPeriod) && lockLimitReached) GUI.enabled = false;
-            lockPeriod = GUILayout.Toggle(lockSMA ? false : lockPeriod, "Orbital Period (s)", GUILayout.Width(lockWidth), GUILayout.ExpandWidth(false));
+            lockPeriod = GUILayout.Toggle(lockSMA ? false : lockPeriod, "Orbital Period (s)", GUILayout.Width(LockWidth), GUILayout.ExpandWidth(false));
             if (!lockPeriod) GUI.enabled = false;
-            periodText = GUILayout.TextField(periodText, GUILayout.Width(inputWidth - synchPeriodButtonWidth - 4), GUILayout.ExpandWidth(false));
-            if (GUILayout.Button("S", GUILayout.Width(synchPeriodButtonWidth), GUILayout.ExpandWidth(false)))
+            periodText = GUILayout.TextField(periodText, GUILayout.Width(InputWidth - CharButtonWidth - 4), GUILayout.ExpandWidth(false));
+            if (GUILayout.Button("S", GUILayout.Width(CharButtonWidth), GUILayout.ExpandWidth(false)))
             {
                 periodText = celestialBodies[selectedCelestialIndex].rotationPeriod.ToString();
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
 
+            // Calculate orbit button.
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Calculate", GUILayout.Width(calculateButtonWidth)))
-            {
-                CalculateAndParseOrbit();
-            }
+            if (GUILayout.Button("Calculate", GUILayout.Width(CalculateButtonWidth))) CalculateAndParseOrbit();
             GUILayout.EndHorizontal();
+        }
 
-            GUILayout.Space(25);
-
+        private void RenderMainOutputArea()
+        {
             GUILayout.BeginHorizontal();
-            if (errorText != "")
-            {
-                GUILayout.Label(errorText);
-            }
+
+            // Display error if it exists.
+            if (errorText != "") GUILayout.Label(errorText);
+
+            // Parse the caclulated orbit.
             if (currentOrbit != null)
             {
                 GUILayout.BeginVertical();
@@ -165,57 +315,37 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Max. Darkness Length: " + SOCUtilis.ParseOrbitElement(currentOrbit.MaxDarknessTime, SimpleOrbit.ScalerType.Time));
                 GUILayout.EndVertical();
             }
+
             GUILayout.EndHorizontal();
+        }
 
-            #region MainWindow : Hohmann Transfer Calculator
+        private void RenderHohmannTransferArea()
+        {
+            // The Orbit 1 Save button.
             GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical();
-
-            if (currentOrbit != null)
-            {
-                GUILayout.Space(25);
-            }
-
-            GUILayout.BeginHorizontal();
-            if (currentOrbit == null)
-            {
-                GUI.enabled = false;
-            }
-            if (GUILayout.Button("Save as Orbit 1", GUILayout.Width(saveOrbitButtonWidth)))
-            {
-                savedOrbit1 = currentOrbit;
-            }
+            if (currentOrbit == null) GUI.enabled = false;
+            if (GUILayout.Button("Save as Orbit 1", GUILayout.Width(SaveOrbitButtonWidth))) savedOrbit1 = currentOrbit;
             GUI.enabled = true;
             if (savedOrbit1 != null)
             {
-                if (GUILayout.Button("C", GUILayout.Width(synchPeriodButtonWidth)))
-                {
-                    savedOrbit1 = null;
-                }
+                if (GUILayout.Button("C", GUILayout.Width(CharButtonWidth))) savedOrbit1 = null;
                 GUILayout.Label(savedOrbit1.ToString(useAltitideAspides));
             }
             GUILayout.EndHorizontal();
 
+            // The Orbit 2 Save button.
             GUILayout.BeginHorizontal();
-            if (currentOrbit == null)
-            {
-                GUI.enabled = false;
-            }
-            if (GUILayout.Button("Save as Orbit 2", GUILayout.Width(saveOrbitButtonWidth)))
-            {
-                savedOrbit2 = currentOrbit;
-            }
+            if (currentOrbit == null) GUI.enabled = false;
+            if (GUILayout.Button("Save as Orbit 2", GUILayout.Width(SaveOrbitButtonWidth))) savedOrbit2 = currentOrbit;
             GUI.enabled = true;
             if (savedOrbit2 != null)
             {
-                if (GUILayout.Button("C", GUILayout.Width(synchPeriodButtonWidth)))
-                {
-                    savedOrbit2 = null;
-                }
+                if (GUILayout.Button("C", GUILayout.Width(CharButtonWidth))) savedOrbit2 = null;
                 GUILayout.Label(savedOrbit2.ToString(useAltitideAspides));
             }
             GUILayout.EndHorizontal();
 
+            // Calculate the delta-V of transfer if valid.
             GUILayout.BeginHorizontal();
             if (savedOrbit1 != null && savedOrbit2 != null)
             {
@@ -238,28 +368,36 @@ namespace SimpleOrbitCalculator
 
             }
             GUILayout.EndHorizontal();
+        }
 
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
-            #endregion
-
-            GUILayout.EndVertical();
-            #endregion
-
-            #region MainWindow : Options Area
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+        /// <summary>
+        /// Renders the calculator's options.
+        /// </summary>
+        private void RenderOptionsArea()
+        {
             GUILayout.Label("Options");
 
+            // The Apsides altitude option.
             GUILayout.BeginHorizontal();
             useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
             GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-            #endregion
+        }
 
-            GUILayout.EndHorizontal();
-            #endregion
-
-            GUI.DragWindow();
+        /// <summary>
+        /// Determines if the lock limit has been reached for the inputs.
+        /// </summary>
+        /// <returns>True is lock limit reached, false if not.</returns>
+        private bool IsLockLimitReached()
+        {
+            int countLocks = 0;
+            bool lockLimitReached = false;
+            if (lockPeriapsis) countLocks++;
+            if (lockApoapsis) countLocks++;
+            if (lockEccentricity) countLocks++;
+            if (lockSMA) countLocks++;
+            if (lockPeriod) countLocks++;
+            if (countLocks >= 2) lockLimitReached = true;
+            return lockLimitReached;
         }
 
         /// <summary>
