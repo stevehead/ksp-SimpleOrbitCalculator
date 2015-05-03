@@ -101,13 +101,13 @@ namespace SimpleOrbitCalculator
             string periapsisText, apoapsisText;
             if (userApsideAltitude)
             {
-                periapsisText = GUIUtilities.ParseOrbitElement(PeriapsisAltitude, ScalerType.Distance);
-                apoapsisText = GUIUtilities.ParseOrbitElement(ApoapsisAltitude, ScalerType.Distance);
+                periapsisText = SOCUtilis.ParseOrbitElement(PeriapsisAltitude, ScalerType.Distance);
+                apoapsisText = SOCUtilis.ParseOrbitElement(ApoapsisAltitude, ScalerType.Distance);
             }
             else
             {
-                periapsisText = GUIUtilities.ParseOrbitElement(Periapsis, ScalerType.Distance);
-                apoapsisText = GUIUtilities.ParseOrbitElement(Apoapsis, ScalerType.Distance);
+                periapsisText = SOCUtilis.ParseOrbitElement(Periapsis, ScalerType.Distance);
+                apoapsisText = SOCUtilis.ParseOrbitElement(Apoapsis, ScalerType.Distance);
             }
             return parentBody.name + ": " + periapsisText + " x " + apoapsisText;
         }
