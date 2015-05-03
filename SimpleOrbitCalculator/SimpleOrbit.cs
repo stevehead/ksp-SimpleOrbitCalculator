@@ -114,7 +114,7 @@ namespace SimpleOrbitCalculator
 
         public static double CalculateHohmannTransferDeltaV(SimpleOrbit orbit1, SimpleOrbit orbit2)
         {
-            SimpleOrbit lowerEnergyOrbit, higherEnergyOrbit, transferOrbit;
+            SimpleOrbit fastestPeriapsisOrbit, slowestPeriapsisOrbit, transferOrbit;
             double deltaV = 0.0;
 
             if (orbit1.ParentBody != orbit2.ParentBody)
@@ -122,24 +122,24 @@ namespace SimpleOrbitCalculator
                 throw new ArgumentException("Input orbits must have same parent body.");
             }
 
-            if (orbit1.SpecificOrbitalEnergy < orbit2.SpecificOrbitalEnergy)
+            if (orbit1.PeriapsisSpeed > orbit2.PeriapsisSpeed)
             {
-                lowerEnergyOrbit = orbit1;
-                higherEnergyOrbit = orbit2;
+                fastestPeriapsisOrbit = orbit1;
+                slowestPeriapsisOrbit = orbit2;
             }
             else
             {
-                lowerEnergyOrbit = orbit2;
-                higherEnergyOrbit = orbit1;
+                fastestPeriapsisOrbit = orbit2;
+                slowestPeriapsisOrbit = orbit1;
             }
 
             SimpleOrbitBuilder transferOrbitBuilder = new SimpleOrbitBuilder(orbit1.ParentBody);
-            transferOrbitBuilder.SetPeriapsis(lowerEnergyOrbit.Periapsis);
-            transferOrbitBuilder.SetApoapsis(higherEnergyOrbit.Periapsis);
+            transferOrbitBuilder.SetPeriapsis(fastestPeriapsisOrbit.Periapsis);
+            transferOrbitBuilder.SetApoapsis(slowestPeriapsisOrbit.Periapsis);
             transferOrbit = transferOrbitBuilder.Build();
 
-            deltaV += Math.Abs(transferOrbit.PeriapsisSpeed - lowerEnergyOrbit.PeriapsisSpeed);
-            deltaV += Math.Abs(higherEnergyOrbit.PeriapsisSpeed - transferOrbit.ApoapsisSpeed);
+            deltaV += Math.Abs(transferOrbit.PeriapsisSpeed - fastestPeriapsisOrbit.PeriapsisSpeed);
+            deltaV += Math.Abs(slowestPeriapsisOrbit.PeriapsisSpeed - transferOrbit.ApoapsisSpeed);
 
             return deltaV;
         }
