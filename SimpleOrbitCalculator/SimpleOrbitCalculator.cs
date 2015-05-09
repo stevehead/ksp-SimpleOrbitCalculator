@@ -20,9 +20,19 @@ namespace SimpleOrbitCalculator
         public const string PluginDirectoryName = "SimpleOrbitCalculator";
 
         /// <summary>
-        /// The stock toolbar's icon.
+        /// The stock toolbar icon.
         /// </summary>
         private const string PluginIconButtonStock = "icon_button_stock";
+
+        /// <summary>
+        /// The Blizzy's toolbar icon.
+        /// </summary>
+        private const string PluginIconButtonBlizzy = "icon_button_blizzy";
+
+        /// <summary>
+        /// Tells plugin to use Blizzy's toolbar if it is available. Will change to an option.
+        /// </summary>
+        private const bool UseBlizzyToolbar = true;
 
         /// <summary>
         /// The application launcher button that is created.
@@ -30,9 +40,19 @@ namespace SimpleOrbitCalculator
         private static ApplicationLauncherButton appLauncherButton = null;
 
         /// <summary>
+        /// The Blizzy's Toolbar button that is created.
+        /// </summary>
+        private static IButton blizzyToolbarButton = null;
+
+        /// <summary>
         /// The calculator object that is created.
         /// </summary>
         private static GameObject calculator;
+
+        /// <summary>
+        /// Is the window open? Really only used for Blizzy's toolbar.
+        /// </summary>
+        private static bool isWindowOpen = false;
 
         /// <summary>
         /// The scenes the button will be visible in.
@@ -45,14 +65,29 @@ namespace SimpleOrbitCalculator
                         | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.VAB;
             }
         }
-
+        
         /// <summary>
         /// Called when the script is loaded.
         /// </summary>
         public void Awake()
         {
-            GameEvents.onGUIApplicationLauncherReady.Add(AddAppLauncherButton);
-            GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveAppLauncherButton);
+            if (UseBlizzyToolbar && ToolbarManager.ToolbarAvailable)
+            {
+                blizzyToolbarButton = ToolbarManager.Instance.add("SimpleOrbitCalculator", "mainWindow");
+                blizzyToolbarButton.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION, GameScenes.FLIGHT);
+                blizzyToolbarButton.TexturePath = String.Format("{0}/Textures/{1}", PluginDirectoryName, PluginIconButtonBlizzy);
+                blizzyToolbarButton.ToolTip = PluginName;
+                blizzyToolbarButton.OnClick += (e) =>
+                {
+                    if (isWindowOpen) OnAppLaunchToggleOff();
+                    else OnAppLaunchToggleOn();
+                };
+            }
+            else
+            {
+                GameEvents.onGUIApplicationLauncherReady.Add(AddAppLauncherButton);
+                GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveAppLauncherButton);
+            }
         }
 
         /// <summary>
@@ -86,6 +121,7 @@ namespace SimpleOrbitCalculator
         private void OnAppLaunchToggleOn()
         {
             calculator = new GameObject("SOCWindow", typeof(CalculatorWindow));
+            isWindowOpen = true;
         }
 
         /// <summary>
@@ -94,6 +130,7 @@ namespace SimpleOrbitCalculator
         private void OnAppLaunchToggleOff()
         {
             Destroy(calculator);
+            isWindowOpen = false;
         }
 
         /// <summary>
@@ -101,7 +138,11 @@ namespace SimpleOrbitCalculator
         /// </summary>
         public static void SetApplauncherButtonFalse()
         {
-            appLauncherButton.SetFalse();
+            if (appLauncherButton != null)
+            {
+                appLauncherButton.SetFalse();
+            }
+            isWindowOpen = false;
         }
     }
 }
