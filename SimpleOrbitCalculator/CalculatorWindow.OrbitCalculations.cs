@@ -45,6 +45,10 @@ namespace SimpleOrbitCalculator
             {
                 errorText = e.Message;
             }
+            catch (FormatException)
+            {
+                errorText = "An input is not a valid number.";
+            }
             catch (Exception e)
             {
                 errorText = "Something unusual happened";
