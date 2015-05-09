@@ -95,7 +95,15 @@ namespace SimpleOrbitCalculator
             // Use current active vessel's orbit button.
             if (HighLogic.LoadedSceneIsFlight)
             {
+                GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Use Current Orbit", GUILayout.Width(UseCurrentOrbitButtonWidth))) LoadActiveVesselOrbit();
+
+                if (FlightGlobals.ActiveVessel.targetObject != null)
+                {
+                    if (GUILayout.Button("Use Target Orbit", GUILayout.Width(UseCurrentOrbitButtonWidth))) LoadTargetOrbit();
+                }
+
+                GUILayout.EndHorizontal();
             }
 
             // Periapsis input.
