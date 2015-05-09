@@ -18,7 +18,10 @@ namespace SimpleOrbitCalculator
             windowPosition = new Rect(100, 100, 800, 465);
 
             // Load celestials.
-            LoadAllCelestialInformation();
+            if (celestialBodies == null)
+            {
+                LoadAllCelestialInformation();
+            }
 
             // Add event handlers.
             GameEvents.onShowUI.Add(ShowUI);

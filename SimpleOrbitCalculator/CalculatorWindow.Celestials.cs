@@ -11,7 +11,7 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// Loads all the information for the celestial bodies.
         /// </summary>
-        private void LoadAllCelestialInformation()
+        private static void LoadAllCelestialInformation()
         {
             LoadKnownCelestials();
             LoadCelestialSelectValues();
@@ -21,7 +21,7 @@ namespace SimpleOrbitCalculator
         /// Grabs all the celestials known to KSP and orders them based on reference body and SMA.
         /// This should be compatible with RSS scales and Planet Factory like mods.
         /// </summary>
-        private void LoadKnownCelestials()
+        private static void LoadKnownCelestials()
         {
             celestialBodies = new List<CelestialBody>();
 
@@ -43,7 +43,7 @@ namespace SimpleOrbitCalculator
         /// Recursively adds all celestial bodies to the list, ordered by parent body and SMA.
         /// </summary>
         /// <param name="celestialBody">the current celestial body</param>
-        private void LoadCelesitalChildren(CelestialBody celestialBody)
+        private static void LoadCelesitalChildren(CelestialBody celestialBody)
         {
             List<CelestialBody> children = FlightGlobals.Bodies.Where(o => o.referenceBody == celestialBody && o != celestialBody)
                 .OrderBy(o => o.orbit.semiMajorAxis).ToList();
@@ -57,7 +57,7 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// Creates the array of strings that represent the select values.
         /// </summary>
-        private void LoadCelestialSelectValues()
+        private static void LoadCelestialSelectValues()
         {
             celestialSelectValues = new string[celestialBodies.Count];
             int initialSelectedIndex = -1;

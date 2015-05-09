@@ -71,97 +71,97 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// List of known celestial bodies in the solar system.
         /// </summary>
-        private List<CelestialBody> celestialBodies;
+        private static List<CelestialBody> celestialBodies;
 
         /// <summary>
         /// The array of celestial's names for the celestial select area.
         /// </summary>
-        private string[] celestialSelectValues;
+        private static string[] celestialSelectValues;
 
         /// <summary>
         /// The current selected celestial index.
         /// </summary>
-        private int selectedCelestialIndex = 0;
+        private static int selectedCelestialIndex = 0;
 
         /// <summary>
         /// Is periapsis locked?
         /// </summary>
-        private bool lockPeriapsis = false;
+        private static bool lockPeriapsis = false;
 
         /// <summary>
         /// Is apoapsis locked?
         /// </summary>
-        private bool lockApoapsis = false;
+        private static bool lockApoapsis = false;
 
         /// <summary>
         /// Is eccentricity locked?
         /// </summary>
-        private bool lockEccentricity = false;
+        private static bool lockEccentricity = false;
 
         /// <summary>
         /// Is semi-major axis locked?
         /// </summary>
-        private bool lockSMA = false;
+        private static bool lockSMA = false;
 
         /// <summary>
         /// Is orbital period locked?
         /// </summary>
-        private bool lockPeriod = false;
+        private static bool lockPeriod = false;
 
         /// <summary>
         /// Is altitude-based apsides being used?
         /// </summary>
-        private bool useAltitideAspides = true;
+        private static bool useAltitideAspides = true;
 
         /// <summary>
         /// Periapsis input.
         /// </summary>
-        private string periapsisText = "";
+        private static string periapsisText = "";
 
         /// <summary>
         /// Apoapsis input.
         /// </summary>
-        private string apoapsisText = "";
+        private static string apoapsisText = "";
 
         /// <summary>
         /// Eccentricity input.
         /// </summary>
-        private string eccentricityText = "";
+        private static string eccentricityText = "";
 
         /// <summary>
         /// Semi-major axis input.
         /// </summary>
-        private string smaText = "";
+        private static string smaText = "";
 
         /// <summary>
         /// Orbital period input.
         /// </summary>
-        private string periodText = "";
+        private static string periodText = "";
 
         /// <summary>
         /// Calculate orbit error text.
         /// </summary>
-        private string errorText = "";
+        private static string errorText = "";
 
         /// <summary>
         /// The currently caclulated orbit.
         /// </summary>
-        private SimpleOrbit currentOrbit = null;
+        private static SimpleOrbit currentOrbit = null;
 
         /// <summary>
         /// The current saved orbit 1.
         /// </summary>
-        private SimpleOrbit savedOrbit1 = null;
+        private static SimpleOrbit savedOrbit1 = null;
 
         /// <summary>
         /// The current saved orbit 2.
         /// </summary>
-        private SimpleOrbit savedOrbit2 = null;
+        private static SimpleOrbit savedOrbit2 = null;
 
         /// <summary>
         /// The number of columns the celestial bodies will be in.
         /// </summary>
-        private int CelestialSelectColumns
+        private static int CelestialSelectColumns
         {
             get { return (int)Math.Ceiling(celestialBodies.Count / (1.0 * MaximumCelestialsPerColumn)); }
         }
@@ -169,7 +169,7 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// The minimum width of the celestial select area.
         /// </summary>
-        private float MinCelestialSelectAreaWidth
+        private static float MinCelestialSelectAreaWidth
         {
             get { return CelestialSelectWidth * CelestialSelectColumns; }
         }
