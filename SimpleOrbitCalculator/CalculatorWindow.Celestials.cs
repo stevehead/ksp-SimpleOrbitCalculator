@@ -35,15 +35,22 @@ namespace SimpleOrbitCalculator
             // Need to add the Sun first.
             celestialBodies.Add(theSun);
 
-            // Loop through each planet.
-            foreach (CelestialBody planet in thePlanets)
-            {
-                // Add the planet.
-                celestialBodies.Add(planet);
+            // Start recursively adding the celestial bodies.
+            LoadCelesitalChildren(theSun);
+        }
 
-                // Gather all the moons of this planet and add to the list.
-                celestialBodies.AddRange(FlightGlobals.Bodies.Where(o => o.referenceBody == planet)
-                    .OrderBy(o => o.orbit.semiMajorAxis).ToList());
+        /// <summary>
+        /// Recursively adds all celestial bodies to the list, ordered by parent body and SMA.
+        /// </summary>
+        /// <param name="celestialBody">the current celestial body</param>
+        private void LoadCelesitalChildren(CelestialBody celestialBody)
+        {
+            List<CelestialBody> children = FlightGlobals.Bodies.Where(o => o.referenceBody == celestialBody && o != celestialBody)
+                .OrderBy(o => o.orbit.semiMajorAxis).ToList();
+            foreach (CelestialBody child in children)
+            {
+                celestialBodies.Add(child);
+                LoadCelesitalChildren(child);
             }
         }
 
