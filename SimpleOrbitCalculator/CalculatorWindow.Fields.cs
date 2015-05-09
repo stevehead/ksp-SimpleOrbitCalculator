@@ -66,7 +66,7 @@ namespace SimpleOrbitCalculator
         /// <summary>
         /// Position of the calculator's window.
         /// </summary>
-        private Rect windowPosition;
+        private static Rect windowPosition = new Rect(100, 100, 800, 465);
 
         /// <summary>
         /// List of known celestial bodies in the solar system.

@@ -15,7 +15,6 @@ namespace SimpleOrbitCalculator
         {
             // Window setup.
             id = Guid.NewGuid().GetHashCode();
-            windowPosition = new Rect(100, 100, 800, 465);
 
             // Load celestials.
             if (celestialBodies == null)
