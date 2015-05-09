@@ -44,7 +44,7 @@ Note: Because the calculation will fill in other elements that you did not choos
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
 
 ### Changelog
-5/9/2015 - **v.1.3.0** *Dangerous Doughnut* - While in flight scenes, can use your target's orbit as input. Blizzy's Toolbar support. Calculations, inputs and window location now persist between window closings and scene changes.
+5/9/2015 - **v.1.3.0** *Dangerous Doughnut* - While in flight scenes, can use your target's orbit as input. Blizzy's Toolbar support. Calculations, inputs and window location now persist between window closings and scene changes. Recursive search to order celestial bodies (this allows moons of moons and deeper... moon-ception, thanks OPM).
 
 5/3/2015 - **v1.2.0** *Cowardly Cheddar* - Can save calculated orbits to calculate the Hohmann transfer delta-v. While in flight scenes, can use your active vessel's orbit as input. Code cleanup for the AppLauncher stuff (thanks for the help stupid_chris!). Code cleanup overall.
 
