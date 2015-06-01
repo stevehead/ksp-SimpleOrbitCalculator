@@ -52,7 +52,7 @@ namespace SimpleOrbitCalculator
         /// ScalerType are the various scalers used by the orbit elements.
         /// This is mostly used for string formatting purposes.
         /// </summary>
-        public enum ScalerType { Distance, Speed, Time, SpecificEnergy, Degrees, Radians };
+        public enum ScalerType { Distance, Speed, Time, SpecificEnergy, Degrees, Radians, Area, Volume, Density, Mass };
 
         internal SimpleOrbit(CelestialBody parentBody, double semiMajorAxis, double eccentricity)
         {

@@ -21,6 +21,12 @@ namespace SimpleOrbitCalculator
             return string.Format("{0:0.###}", input);
         }
 
+        public static string ParseOrbitElement(double input, string unit)
+        {
+            // Default to 3 decimals.
+            return string.Format("{0:0.###} " + unit, input);
+        }
+
         /// <summary>
         /// Converts orbit element scalers into an easy to read string.
         /// </summary>
@@ -35,15 +41,31 @@ namespace SimpleOrbitCalculator
                 case SimpleOrbit.ScalerType.Distance:
                     return string.Format("{0:0.###} km", input / 1000.0);
 
+                // Area will be 3 decimals and in km^2.
+                case SimpleOrbit.ScalerType.Area:
+                    return string.Format("{0:0.###} km²", input / 1000000.0);
+
+                // Volume will be 3 decimals, sci notation and in km^3.
+                case SimpleOrbit.ScalerType.Volume:
+                    return string.Format("{0:0.0##e0} km³", input / 1000000000.0);
+
+                // Mass will be 3 decimals, sci notation and in kg.
+                case SimpleOrbit.ScalerType.Mass:
+                    return string.Format("{0:0.0##e0} kg", input);
+
+                // Density will be 3 decimals, and in g/cm^3.
+                case SimpleOrbit.ScalerType.Density:
+                    return string.Format("{0:0.###} g/cm³", input / 1000.0);
+
                 // Speed will be 1 decimal and in meters per seconds.
                 case SimpleOrbit.ScalerType.Speed:
                     return string.Format("{0:0.#} m/s", input);
 
                 // Time will be displayed as days, hours, minutes and seconds.
                 case SimpleOrbit.ScalerType.Time:
-                    int seconds = (int)Math.Round(input);
+                    string output = (input < 0) ? "-" : "";
+                    int seconds = (int)Math.Round(Math.Abs(input));
                     TimeSpan span = new TimeSpan(0, 0, seconds);
-                    string output = "";
 
                     if (span.Days > 0) output += span.Days + "d ";
                     if (span.Hours > 0) output += span.Hours + "h ";
@@ -67,6 +89,29 @@ namespace SimpleOrbitCalculator
                 // Will default to 3 decimals for unknown types.
                 default:
                     return ParseOrbitElement(input);
+            }
+        }
+
+        public static CelestialBody PlanetOfCelesital(CelestialBody celestialBody)
+        {
+            if (celestialBody.referenceBody != celestialBody || celestialBody.referenceBody == null)
+            {
+                CelestialBody planet = celestialBody;
+                while (true)
+                {
+                    if (planet.referenceBody.referenceBody == planet.referenceBody || planet.referenceBody.referenceBody == null)
+                    {
+                        return planet;
+                    }
+                    else
+                    {
+                        planet = planet.referenceBody;
+                    }
+                }
+            }
+            else
+            {
+                return null;
             }
         }
     }
