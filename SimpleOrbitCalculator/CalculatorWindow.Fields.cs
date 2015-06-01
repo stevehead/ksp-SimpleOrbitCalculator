@@ -114,6 +114,11 @@ namespace SimpleOrbitCalculator
         private static bool useAltitideAspides = true;
 
         /// <summary>
+        /// Is the window render mode in celestial body mode?
+        /// </summary>
+        private static bool inCelestialBodyInfoMode = false;
+
+        /// <summary>
         /// Periapsis input.
         /// </summary>
         private static string periapsisText = "";

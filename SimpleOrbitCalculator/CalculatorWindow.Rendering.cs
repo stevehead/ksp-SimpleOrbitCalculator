@@ -14,7 +14,7 @@ namespace SimpleOrbitCalculator
         private void RenderWindow(int windowId)
         {
             // Begin Main Window
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
 
             // Begin Left Column
             GUILayout.BeginVertical(GUILayout.MinWidth(MinCelestialSelectAreaWidth), GUILayout.ExpandWidth(true));
@@ -24,47 +24,64 @@ namespace SimpleOrbitCalculator
 
             GUILayout.Space(20);
 
-            // Begin Right Column
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            if (!inCelestialBodyInfoMode)
+            {
+                // Begin Right Column
+                GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
 
-            // Begin Right Column, Top Row
-            GUILayout.BeginHorizontal();
+                // Begin Right Column, Top Row
+                GUILayout.BeginHorizontal();
 
-            // Begin Right Column, Top Row, Left Column
-            GUILayout.BeginVertical();
-            RenderMainInputArea();
-            GUILayout.EndVertical();
-            // End Right Column, Top Row, Left Column
+                // Begin Right Column, Top Row, Left Column
+                GUILayout.BeginVertical();
+                RenderMainInputArea();
+                GUILayout.EndVertical();
+                // End Right Column, Top Row, Left Column
 
-            // Begin Right Column, Top Row, Right Column
-            GUILayout.BeginVertical();
-            RenderOptionsArea();
-            GUILayout.EndVertical();
-            // End Right Column, Top Row, Right Column
+                // Begin Right Column, Top Row, Right Column
+                GUILayout.BeginVertical();
+                RenderOptionsArea();
+                GUILayout.EndVertical();
+                // End Right Column, Top Row, Right Column
 
-            GUILayout.EndHorizontal();
-            // End Right Column, Top Row
+                GUILayout.EndHorizontal();
+                // End Right Column, Top Row
 
-            GUILayout.Space(25);
+                GUILayout.Space(25);
 
-            // Begin Right Column, Middle Row
-            GUILayout.BeginHorizontal();
-            RenderMainOutputArea();
-            GUILayout.EndHorizontal();
-            // End Right Column, Middle Row
+                // Begin Right Column, Middle Row
+                GUILayout.BeginHorizontal();
+                RenderMainOutputArea();
+                GUILayout.EndHorizontal();
+                // End Right Column, Middle Row
 
-            GUILayout.Space(25);
+                GUILayout.Space(25);
 
-            // Begin Right Column, Bottom Row
-            GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical();
-            RenderHohmannTransferArea();
-            GUILayout.EndVertical();
-            GUILayout.EndHorizontal();
-            // End Right Column, Bottom Row
+                // Begin Right Column, Bottom Row
+                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical();
+                RenderHohmannTransferArea();
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+                // End Right Column, Bottom Row
 
-            GUILayout.EndVertical();
-            // End Right Column
+                GUILayout.EndVertical();
+                // End Right Column
+            }
+            else
+            {
+                // Begin Center Column
+                GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+                RenderCelestialInfoArea();
+                GUILayout.EndVertical();
+                // End Center Column
+
+                // Begin Left Column
+                GUILayout.BeginVertical();
+                RenderOptionsArea();
+                GUILayout.EndVertical();
+                // End left Column
+            }
 
             GUILayout.EndHorizontal();
             // End MainWindow
@@ -243,8 +260,73 @@ namespace SimpleOrbitCalculator
         {
             GUILayout.Label("Options");
 
-            // The Apsides altitude option.
-            useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
+            if (!inCelestialBodyInfoMode)
+            {
+                // The Apsides altitude option.
+                useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
+            }
+
+            // The celestial body info mode option.
+            inCelestialBodyInfoMode = GUILayout.Toggle(inCelestialBodyInfoMode, "Celestial Body Info Mode");
+        }
+
+        /// <summary>
+        /// Renders the celestial info area.
+        /// </summary>
+        private void RenderCelestialInfoArea()
+        {
+            // The current celestial.
+            CelestialBody celestialBody = celestialBodies[selectedCelestialIndex];
+
+            // Displays the current celestial.
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Selected Body: " + celestialSelectValues[selectedCelestialIndex]);
+            GUILayout.EndHorizontal();
+
+            // Main info area
+            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+
+            // Orbital Characteristics
+            if (celestialBody.orbit != null)
+            {
+                GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+                GUILayout.Label("ORBITAL CHARACTERISTICS");
+                GUILayout.Label("Apopapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.ApR, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Periapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.PeR, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Semi-major axis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.semiMajorAxis, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Eccentricity: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.eccentricity));
+                GUILayout.Label("Orbital period: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.period, SimpleOrbit.ScalerType.Time));
+                //GUILayout.Label("Average orbital speed: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit., SimpleOrbit.ScalerType.Time));
+                GUILayout.Label("Mean anomaly at epoch: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.meanAnomalyAtEpoch, SimpleOrbit.ScalerType.Radians));
+                GUILayout.Label("Inclination: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.inclination, SimpleOrbit.ScalerType.Degrees));
+                GUILayout.Label("Longitude of ascending node: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.LAN, SimpleOrbit.ScalerType.Degrees));
+                GUILayout.Label("Argument of periapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.argumentOfPeriapsis, SimpleOrbit.ScalerType.Degrees));
+                GUILayout.EndVertical();
+            }
+
+            // Physical Characteristics
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            GUILayout.Label("PHYSICAL CHARACTERISTICS");
+            GUILayout.Label("Radius: " + SOCUtilis.ParseOrbitElement(celestialBody.Radius, SimpleOrbit.ScalerType.Distance));
+            GUILayout.Label("Circumference: " + SOCUtilis.ParseOrbitElement(celestialBody.Radius * 2.0 * Math.PI, SimpleOrbit.ScalerType.Distance));
+            GUILayout.Label("Surface area: " + SOCUtilis.ParseOrbitElement(celestialBody.SurfaceArea, SimpleOrbit.ScalerType.Area));
+            GUILayout.Label("Volume: " + SOCUtilis.ParseOrbitElement(celestialBody.Mass / celestialBody.Density, SimpleOrbit.ScalerType.Volume));
+            GUILayout.Label("Mass: " + SOCUtilis.ParseOrbitElement(celestialBody.Mass, SimpleOrbit.ScalerType.Mass));
+            GUILayout.Label("Density: " + SOCUtilis.ParseOrbitElement(celestialBody.Density, SimpleOrbit.ScalerType.Density));
+            GUILayout.Label("Surface gravity: " + SOCUtilis.ParseOrbitElement(celestialBody.GeeASL, "g"));
+            GUILayout.Label("Escape velocity: " + SOCUtilis.ParseOrbitElement(Math.Sqrt(2.0 * celestialBody.gravParameter / celestialBody.Radius), SimpleOrbit.ScalerType.Speed));
+            GUILayout.Label("Sphere of influence: " + SOCUtilis.ParseOrbitElement(celestialBody.sphereOfInfluence, SimpleOrbit.ScalerType.Distance));
+            GUILayout.Label("Sidereal rotation period: " + SOCUtilis.ParseOrbitElement(celestialBody.rotationPeriod, SimpleOrbit.ScalerType.Time));
+
+            CelestialBody planet = SOCUtilis.PlanetOfCelesital(celestialBody);
+            if (planet != null)
+            {
+                double solarDay = Math.Abs(celestialBody.rotationPeriod / (1.0 - celestialBody.rotationPeriod / planet.orbit.period));
+                GUILayout.Label("Solar day: " + SOCUtilis.ParseOrbitElement(solarDay, SimpleOrbit.ScalerType.Time));
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
 
         /// <summary>
