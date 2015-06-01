@@ -55,6 +55,15 @@ namespace SimpleOrbitCalculator
                 case SimpleOrbit.ScalerType.SpecificEnergy:
                     return string.Format("{0:0.###} J/kg", input);
 
+                // Degrees will be 3 decimals
+                case SimpleOrbit.ScalerType.Degrees:
+                    return string.Format("{0:0.###}°", input);
+
+                // Radians will be converted to degrees and be 3 decimals
+                case SimpleOrbit.ScalerType.Radians:
+                    input *= 180.0 / Math.PI;
+                    return string.Format("{0:0.###}°", input);
+
                 // Will default to 3 decimals for unknown types.
                 default:
                     return ParseOrbitElement(input);
