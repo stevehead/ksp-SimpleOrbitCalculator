@@ -39,14 +39,14 @@ namespace SimpleOrbitCalculator
                 case SimpleOrbit.ScalerType.Speed:
                     return string.Format("{0:0.#} m/s", input);
 
-                // Time will be displayed as hours, minutes and seconds.
+                // Time will be displayed as days, hours, minutes and seconds.
                 case SimpleOrbit.ScalerType.Time:
                     int seconds = (int)Math.Round(input);
                     TimeSpan span = new TimeSpan(0, 0, seconds);
-
-                    int hours = span.Days * 24 + span.Hours;
                     string output = "";
-                    if (hours > 0) output += hours + "h ";
+
+                    if (span.Days > 0) output += span.Days + "d ";
+                    if (span.Hours > 0) output += span.Hours + "h ";
                     if (span.Minutes > 0) output += span.Minutes + "m ";
                     if (span.Seconds > 0) output += span.Seconds + "s ";
                     return output.Trim();
