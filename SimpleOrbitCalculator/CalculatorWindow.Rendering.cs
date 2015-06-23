@@ -291,7 +291,7 @@ namespace SimpleOrbitCalculator
             {
                 GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
                 GUILayout.Label("ORBITAL CHARACTERISTICS");
-                GUILayout.Label("Apopapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.ApR, SimpleOrbit.ScalerType.Distance));
+                GUILayout.Label("Apoapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.ApR, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Periapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.PeR, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Semi-major axis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.semiMajorAxis, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Eccentricity: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.eccentricity));
