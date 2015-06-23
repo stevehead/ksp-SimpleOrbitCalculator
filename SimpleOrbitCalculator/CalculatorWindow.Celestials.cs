@@ -72,8 +72,8 @@ namespace SimpleOrbitCalculator
                 {
                     initialSelectedIndex = i;
                 }
-                // Else set the initial index to Kerbin.
-                else if (initialSelectedIndex < 0 && celestialBodies[i].name.Equals("Kerbin"))
+                // Else set the initial index to the home world.
+                else if (initialSelectedIndex < 0 && celestialBodies[i].isHomeWorld)
                 {
                     initialSelectedIndex = i;
                 }
