@@ -92,11 +92,19 @@ namespace SimpleOrbitCalculator
             }
         }
 
+        /// <summary>
+        /// Finds the primary planet of the system the celestial body is part of.
+        /// Example: Kerbin is part of the Kerbin system, Ike is part of the Duna system, etc.
+        /// </summary>
+        /// <param name="celestialBody">the celestial body in question</param>
+        /// <returns>the primary celestial body</returns>
         public static CelestialBody PlanetOfCelesital(CelestialBody celestialBody)
         {
+            // Do not perform logic if input is the Sun
             if (celestialBody.referenceBody != celestialBody || celestialBody.referenceBody == null)
             {
                 CelestialBody planet = celestialBody;
+                // Loop until the celestial body is not the Sun
                 while (true)
                 {
                     if (planet.referenceBody.referenceBody == planet.referenceBody || planet.referenceBody.referenceBody == null)
