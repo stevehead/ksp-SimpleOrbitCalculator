@@ -326,6 +326,10 @@ namespace SimpleOrbitCalculator
             {
                 double solarDay = Math.Abs(celestialBody.rotationPeriod / (1.0 - celestialBody.rotationPeriod / planet.orbit.period));
                 GUILayout.Label("Solar day: " + SOCUtilis.ParseOrbitElement(solarDay, SimpleOrbit.ScalerType.Time));
+                if (celestialBody.atmosphere)
+                {
+                    GUILayout.Label("Surface pressure: " + SOCUtilis.ParseOrbitElement(celestialBody.atmospherePressureSeaLevel, "kPa"));
+                }
             }
 
             GUILayout.EndVertical();
