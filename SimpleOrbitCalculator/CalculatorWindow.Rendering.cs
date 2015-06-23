@@ -289,6 +289,9 @@ namespace SimpleOrbitCalculator
             // Orbital Characteristics
             if (celestialBody.orbit != null)
             {
+                // Calculations
+                double meanOrbitalSpeed = OrbitMath.MeanOrbitalSpeed(celestialBody.orbit.semiMajorAxis, celestialBody.orbit.eccentricity, celestialBody.referenceBody.gravParameter);
+
                 GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
                 GUILayout.Label("ORBITAL CHARACTERISTICS");
                 GUILayout.Label("Apoapsis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.ApR, SimpleOrbit.ScalerType.Distance));
@@ -296,7 +299,7 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Semi-major axis: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.semiMajorAxis, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Eccentricity: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.eccentricity));
                 GUILayout.Label("Orbital period: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.period, SimpleOrbit.ScalerType.Time));
-                //GUILayout.Label("Average orbital speed: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit., SimpleOrbit.ScalerType.Time));
+                GUILayout.Label("Average orbital speed: " + SOCUtilis.ParseOrbitElement(meanOrbitalSpeed, SimpleOrbit.ScalerType.Time));
                 GUILayout.Label("Mean anomaly at epoch: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.meanAnomalyAtEpoch, SimpleOrbit.ScalerType.Radians));
                 GUILayout.Label("Inclination: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.inclination, SimpleOrbit.ScalerType.Degrees));
                 GUILayout.Label("Longitude of ascending node: " + SOCUtilis.ParseOrbitElement(celestialBody.orbit.LAN, SimpleOrbit.ScalerType.Degrees));
