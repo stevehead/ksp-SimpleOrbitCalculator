@@ -50,9 +50,9 @@ namespace SimpleOrbitCalculator
                 GUILayout.Space(25);
 
                 // Begin Right Column, Middle Row
-                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical();
                 RenderMainOutputArea();
-                GUILayout.EndHorizontal();
+                GUILayout.EndVertical();
                 // End Right Column, Middle Row
 
                 GUILayout.Space(25);
@@ -184,6 +184,18 @@ namespace SimpleOrbitCalculator
             // Parse the caclulated orbit.
             if (currentOrbit != null)
             {
+                GUILayout.BeginHorizontal();
+                if (currentOrbit.IsOutsideSOI)
+                {
+                    GUILayout.Label("Warning: Orbit is outside of the SOI.");
+                }
+                if (currentOrbit.Periapsis < currentOrbit.ParentBody.Radius)
+                {
+                    GUILayout.Label("Warning: Orbit intersects surface.");
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
                 GUILayout.BeginVertical();
                 GUILayout.Label("Periapsis Alt.: " + SOCUtilis.ParseOrbitElement(currentOrbit.PeriapsisAltitude, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Periapsis: " + SOCUtilis.ParseOrbitElement(currentOrbit.Periapsis, SimpleOrbit.ScalerType.Distance));
@@ -209,6 +221,7 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Mean Orbit Speed: " + SOCUtilis.ParseOrbitElement(currentOrbit.MeanOrbitalSpeed, SimpleOrbit.ScalerType.Speed));
                 GUILayout.Label("Max. Darkness Length: " + SOCUtilis.ParseOrbitElement(currentOrbit.MaxDarknessTime, SimpleOrbit.ScalerType.Time));
                 GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
             }
         }
 

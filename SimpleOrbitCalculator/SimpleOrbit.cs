@@ -47,6 +47,13 @@ namespace SimpleOrbitCalculator
         public double SpecificAngularMomentum { get { return specificAngularMomentum; } }
         public double MaxDarknessTime { get { return maxDarknessTime; } }
         public double MeanDarknessTime { get { return meanDarknessTime; } }
+        public Boolean IsOutsideSOI
+        {
+            get
+            {
+                return Apoapsis >= ParentBody.sphereOfInfluence;
+            }
+        }
 
         /// <summary>
         /// ScalerType are the various scalers used by the orbit elements.
