@@ -61,10 +61,10 @@ namespace SimpleOrbitCalculator
             this.eccentricity = eccentricity;
 
             // Ellipse features
-            semiMinorAxis = semiMajorAxis * Math.Sqrt(1.0 - Math.Pow(eccentricity, 2.0));
-            semiLatusRectum = Math.Pow(semiMinorAxis, 2.0) / semiMajorAxis;
-            focalParameter = semiLatusRectum / eccentricity;
-            linearEccentricity = semiMajorAxis * eccentricity;
+            semiMinorAxis = OrbitMath.SemiMinorAxis(semiMajorAxis, eccentricity);
+            semiLatusRectum = OrbitMath.SemiLatusRectum(semiMajorAxis, eccentricity);
+            focalParameter = OrbitMath.FocalParameter(semiMajorAxis, eccentricity);
+            linearEccentricity = OrbitMath.LinearEccentricity(semiMajorAxis, eccentricity);
 
             // Apside calculations
             apoapsis = semiMajorAxis * (1.0 + eccentricity);
@@ -78,11 +78,7 @@ namespace SimpleOrbitCalculator
             // Speed calculations
             apoapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / apoapsis - 1.0 / semiMajorAxis));
             periapsisSpeed = Math.Sqrt(parentBody.gravParameter * (2.0 / periapsis - 1.0 / semiMajorAxis));
-            meanOrbitalSpeed = Math.Sqrt(parentBody.gravParameter / semiMajorAxis) * (
-                1.0 - 1.0 / 4.0 * Math.Pow(eccentricity, 2.0)
-                - 3.0 / 64.0 * Math.Pow(eccentricity, 4.0)
-                - 5.0 / 256.0 * Math.Pow(eccentricity, 6.0)
-                - 175.0 / 16384.0 * Math.Pow(eccentricity, 8.0));
+            meanOrbitalSpeed = OrbitMath.MeanOrbitalSpeed(semiMajorAxis, eccentricity, parentBody.gravParameter);
             
             // Misc. calculations
             specificOrbitalEnergy = -parentBody.gravParameter / (2.0 * semiMajorAxis);
