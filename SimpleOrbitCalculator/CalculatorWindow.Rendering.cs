@@ -190,7 +190,15 @@ namespace SimpleOrbitCalculator
                 GUILayout.Label("Periapsis Speed: " + SOCUtilis.ParseOrbitElement(currentOrbit.PeriapsisSpeed, SimpleOrbit.ScalerType.Speed));
                 GUILayout.Label("S.Major Axis: " + SOCUtilis.ParseOrbitElement(currentOrbit.SemiMajorAxis, SimpleOrbit.ScalerType.Distance));
                 GUILayout.Label("Period: " + SOCUtilis.ParseOrbitElement(currentOrbit.OrbitalPeriod, SimpleOrbit.ScalerType.Time));
-                GUILayout.Label("SOI Limit: " + SOCUtilis.ParseOrbitElement(currentOrbit.ParentBody.sphereOfInfluence, SimpleOrbit.ScalerType.Distance));
+                try
+                {
+                    string dragText = (currentOrbit.ParentBody.atmosphere) ? " + drag" : "";
+                    GUILayout.Label("Launch Delta-V: " + SOCUtilis.ParseOrbitElement(currentOrbit.CalculateEquatorialLandingDeltaV(), SimpleOrbit.ScalerType.Speed) + dragText);
+                }
+                catch (OrbitalElementExecption e)
+                {
+                    GUILayout.Label("Launch Delta-V: n/a");
+                }
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical();

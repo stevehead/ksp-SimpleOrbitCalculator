@@ -139,6 +139,23 @@ namespace SimpleOrbitCalculator
 
             return deltaV;
         }
+
+        public double CalculateEquatorialLandingDeltaV()
+        {
+            SimpleOrbit transferOrbit;
+            double deltaV = 0.0;
+            double equatorialRotationSpeed = 2.0 * Math.PI * ParentBody.Radius / ParentBody.rotationPeriod;
+
+            SimpleOrbitBuilder transferOrbitBuilder = new SimpleOrbitBuilder(ParentBody);
+            transferOrbitBuilder.SetApoapsis(Apoapsis);
+            transferOrbitBuilder.SetPeriapsis(ParentBody.Radius);
+            transferOrbit = transferOrbitBuilder.Build();
+
+            deltaV += Math.Abs(ApoapsisSpeed - transferOrbit.ApoapsisSpeed);
+            deltaV += Math.Abs(transferOrbit.PeriapsisSpeed - equatorialRotationSpeed);
+
+            return deltaV;
+        }
     }
 
     public class SimpleOrbitBuilder
