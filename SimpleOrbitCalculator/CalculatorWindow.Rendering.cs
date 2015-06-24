@@ -287,6 +287,12 @@ namespace SimpleOrbitCalculator
                 // The Apsides altitude option.
                 useAltitideAspides = GUILayout.Toggle(useAltitideAspides, "Use Altitudes for Apsides");
             }
+
+            // Option for using Blizzy's Toolbar or Stock
+            if (ToolbarManager.ToolbarAvailable)
+            {
+                SOCSettings.Instance.ForceStockToolbar = !GUILayout.Toggle(!SOCSettings.Instance.ForceStockToolbar, "Use Blizzy's Toolbar");
+            }
         }
 
         /// <summary>
