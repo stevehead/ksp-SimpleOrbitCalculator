@@ -56,6 +56,7 @@
     <Compile Include="SimpleOrbit.cs" />
     <Compile Include="SimpleOrbitCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SOCSettings.cs" />
     <Compile Include="SOCUtilis.cs" />
     <Compile Include="ToolbarWrapper.cs" />
   </ItemGroup>
