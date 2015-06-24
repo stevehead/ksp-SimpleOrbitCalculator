@@ -22,19 +22,28 @@ Note: Because the calculation will fill in other elements that you did not choos
 2. When two orbits are saved that have the same parent body, the delta-v for the transfer will be calculated and displayed below.
 3. Click the *C* buttons to clear their respective orbits.
 
+### How to use the info mode
+1. Select the celestial body on the left.
+2. Toggle on *Celestial Body Info Mode* from the options on the right.
+
 ### Current features
 * Will automatically detect all celestial bodies known to KSP and their properties, including changes/additions by RSS or Planet Factory like mods.
 * Allowed inputs include: Apoapsis, Periapsis, Semi-Major Axis, Eccentricity, Orbital Period.
-* Other information displayed after calculation: Orbital Speeds at Apoapsis and Periapsis, Mean Orbital Speed, Sphere of Influence of Parent Body, Max Darkness Length (useful for Remote Tech satellite electric charge calculations).
+* Other information displayed after calculation: Orbital Speeds at Apoapsis and Periapsis, Mean Orbital Speed, Launch Delta-V (the minimum dV required to launch to or land from the orbit), Max Darkness Length (useful for Remote Tech satellite electric charge calculations).
 * Can use your current vessel's or target's orbit as input.
 * Can save two orbits to calculate the delta-v required for a Hohmann transfer.
 * Blizzy's Toolbar support.
+* Celestial Body Info mode will display orbit and physical characteristics of the selected body, similar to that found on a wiki page.
 
 ### Upcoming features
 * A better UI!... still.
 * Possibly more input values.
 * Ability to save orbits for re-use across saves/installs.
-* Setting to force stock toolbar over Blizzy's.
+
+### Known issues
+* Hyperbolic trajectories can have incorrect display data. Will have better support soon.
+* Very large orbital periods do not display. This is mostly an issue with outer planets in a large scale solar system.
+* Option to use Blizzy's Toolbar or stock requires a restart of the game. Looking into the best way to handle an in-game switch.
 
 ### Will not implement
 * Interplanetary transfers (there already exists such a mod: [Transfer Window Planner](http://forum.kerbalspaceprogram.com/threads/93115)).
@@ -44,6 +53,8 @@ Note: Because the calculation will fill in other elements that you did not choos
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
 
 ### Changelog
+6/23/2015 - **v1.4.0** *Ecstatic Enchilada* - Celestial body info mode added! Orbit calculation now will display minimum ideal delta-V to launch to or land from calculated orbit, not including atmospheric drag. Parent body SOI moved to celestial body info mode. New warnings for orbits calculated to be outside of SOI or that intersect the planet. Users with Blizzy's Toolbar can now use the stock toolbar instead (requires restart).
+
 5/9/2015 - **v1.3.1** - Previous version included the wrong DLL, this has been fixed.
 
 5/9/2015 - **v1.3.0** *Dangerous Doughnut* - While in flight scenes, can use your target's orbit as input. Blizzy's Toolbar support. Calculations, inputs and window location now persist between window closings and scene changes. Recursive search to order celestial bodies (this allows moons of moons and deeper... moon-ception, thanks OPM).
