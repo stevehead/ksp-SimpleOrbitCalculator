@@ -54,6 +54,15 @@ namespace SimpleOrbitCalculator
         public bool ForceStockToolbar
         {
             get { return forceStockToolbar; }
+            set
+            {
+                bool saveSettings = forceStockToolbar != value;
+                forceStockToolbar = value;
+                if (saveSettings)
+                {
+                    SaveSettings();
+                }
+            }
         }
 
         /// <summary>
@@ -81,7 +90,11 @@ namespace SimpleOrbitCalculator
         /// </summary>
         private SOCSettings()
         {
-            if (File.Exists(AbsoluteSettingsPath))
+            if (!File.Exists(AbsoluteSettingsPath))
+            {
+                SaveSettings();
+            }
+            else
             {
                 if (!LoadSettings())
                 {
