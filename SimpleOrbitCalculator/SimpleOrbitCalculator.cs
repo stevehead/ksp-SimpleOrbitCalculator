@@ -30,11 +30,6 @@ namespace SimpleOrbitCalculator
         private const string PluginIconButtonBlizzy = "icon_button_blizzy";
 
         /// <summary>
-        /// Tells plugin to use Blizzy's toolbar if it is available. Will change to an option.
-        /// </summary>
-        private const bool UseBlizzyToolbar = true;
-
-        /// <summary>
         /// The application launcher button that is created.
         /// </summary>
         private static ApplicationLauncherButton appLauncherButton = null;
@@ -55,6 +50,17 @@ namespace SimpleOrbitCalculator
         private static bool isWindowOpen = false;
 
         /// <summary>
+        /// Tells plugin to use Blizzy's toolbar if it is available.
+        /// </summary>
+        private static bool UseBlizzyToolbar
+        {
+            get
+            {
+                return ToolbarManager.ToolbarAvailable && !SOCSettings.Instance.ForceStockToolbar;
+            }
+        }
+
+        /// <summary>
         /// The scenes the button will be visible in.
         /// </summary>
         private static ApplicationLauncher.AppScenes ScenesApplicationVisibleIn
@@ -71,7 +77,7 @@ namespace SimpleOrbitCalculator
         /// </summary>
         public void Awake()
         {
-            if (UseBlizzyToolbar && ToolbarManager.ToolbarAvailable)
+            if (UseBlizzyToolbar)
             {
                 blizzyToolbarButton = ToolbarManager.Instance.add("SimpleOrbitCalculator", "mainWindow");
                 blizzyToolbarButton.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.SPACECENTER, GameScenes.TRACKSTATION, GameScenes.FLIGHT);
