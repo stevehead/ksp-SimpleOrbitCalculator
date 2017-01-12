@@ -27,7 +27,7 @@ Note: Because the calculation will fill in other elements that you did not choos
 2. Toggle on *Celestial Body Info Mode* from the options on the right.
 
 ### Current features
-* Will automatically detect all celestial bodies known to KSP and their properties, including changes/additions by RSS or Planet Factory like mods.
+* Will automatically detect all celestial bodies known to KSP and their properties, including changes/additions by Kopernicus.
 * Allowed inputs include: Apoapsis, Periapsis, Semi-Major Axis, Eccentricity, Orbital Period.
 * Other information displayed after calculation: Orbital Speeds at Apoapsis and Periapsis, Mean Orbital Speed, Launch Delta-V (the minimum dV required to launch to or land from the orbit), Max Darkness Length (useful for Remote Tech satellite electric charge calculations).
 * Can use your current vessel's or target's orbit as input.
@@ -53,6 +53,8 @@ Note: Because the calculation will fill in other elements that you did not choos
 This plugin is released under the GNU General Public License: http://www.gnu.org/licenses/.
 
 ### Changelog
+1/12/2017 - **v1.5.0** *Fearless Fajita* - The revival of SOC! KSP 1.2.2 compatibility update. No feature updates.
+
 6/23/2015 - **v1.4.0** *Ecstatic Enchilada* - Celestial body info mode added! Orbit calculation now will display minimum ideal delta-V to launch to or land from calculated orbit, not including atmospheric drag. Parent body SOI moved to celestial body info mode. New warnings for orbits calculated to be outside of SOI or that intersect the planet. Users with Blizzy's Toolbar can now use the stock toolbar instead (requires restart).
 
 5/9/2015 - **v1.3.1** - Previous version included the wrong DLL, this has been fixed.
